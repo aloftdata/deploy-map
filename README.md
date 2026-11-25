@@ -8,7 +8,8 @@ all work the same way.
 
 > Early development: a map with coloured markers and a legend, a table view and filters so far.
 
-Demo: <https://aloftdata.github.io/deploy-map/>
+- Demo: <https://aloftdata.github.io/deploy-map/>
+- Quick start tutorial: <https://aloftdata.github.io/deploy-map/demo/tutorial.html>
 
 ## Usage
 

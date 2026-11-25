@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>deploy-map quick start</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../dist/deploy-map.css">
+    <script src="../dist/deploy-map.js"></script>
+    <style>
+      main { max-width: 52rem; }
+      h2 { margin-top: 3rem; }
+      pre { padding: 1rem; border: 1px solid var(--bs-border-color); border-radius: var(--bs-border-radius); background: var(--bs-tertiary-bg); }
+      .result { height: 400px; margin-bottom: 1.5rem; }
+    </style>
+  </head>
+  <body>
+    <main class="container py-4">
+      <h1>deploy-map quick start</h1>
+      <p class="lead">
+        deploy-map shows a set of points on a map and in a table, with filters,
+        colours and a legend. This page starts with the smallest possible
+        example and adds one thing at a time.
+      </p>
+      <p>
+        Every map below is live, and is created by exactly the code shown above
+        it. See also the <a href="index.html">demo</a>.
+      </p>
+
+      <h2 id="setup">Setting up</h2>
+      <p>
+        Add the stylesheet and the script to your page. The script contains
+        everything the widget needs, and creates one global, <code>DeployMap</code>.
+      </p>
+<pre><code>&lt;link rel="stylesheet" href="deploy-map.css"&gt;
+&lt;script src="deploy-map.js"&gt;&lt;/script&gt;</code></pre>
+      <p>
+        Then add an element for the widget, and give it a height. The widget
+        fills the element.
+      </p>
+<pre><code>&lt;div id="map" style="height: 400px"&gt;&lt;/div&gt;</code></pre>
+
+      <h2 id="first">Your first map</h2>
+      <p>
+        Call <code>DeployMap.mount()</code> with the element and your points.
+        The points are <a href="https://geojson.org/">GeoJSON</a>: a
+        <code>FeatureCollection</code> of <code>Point</code> features, each with
+        any properties you like. Note that GeoJSON coordinates are longitude
+        first, then latitude.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#first-map', {
+  data: {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [4.35, 50.85] },
+        properties: { name: 'Brussels', country: 'Belgium' },
+      },
+      {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [4.9, 52.37] },
+        properties: { name: 'Amsterdam', country: 'Netherlands' },
+      },
+      {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [2.35, 48.86] },
+        properties: { name: 'Paris', country: 'France' },
+      },
+    ],
+  },
+})</code></pre>
+      <div id="first-map" class="result"></div>
+      <p>
+        That is all that is required. <code>data</code> is the only option
+        without a default: the map zooms to fit your points, and the
+        <strong>Table</strong> button shows the same points as a table, with one
+        column per property.
+      </p>
+
+      <h2 id="url">Loading data from a URL</h2>
+      <p>
+        Usually the points live in a file. Give its URL instead of the data
+        itself. The rest of this page uses a file of radar deployments in
+        western Europe.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#url-map', {
+  data: 'registry.json',
+})</code></pre>
+      <div id="url-map" class="result"></div>
+      <p>
+        Have a look at the table: this file has many properties, so the table
+        has many columns. Properties that hold a list or an object are left out.
+      </p>
+
+      <h2 id="table">Choosing the table columns</h2>
+      <p>
+        List the properties you want with <code>table.columns</code>, in the
+        order you want them. A header is the property name made readable
+        (<code>radar_id</code> becomes "Radar id"); to choose it yourself, give
+        an object with a <code>label</code>.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#table-map', {
+  data: 'registry.json',
+  table: {
+    columns: [
+      { property: 'radar_id', label: 'Code' },
+      'type',
+      'country',
+      'location',
+      'start',
+      'end',
+    ],
+  },
+})</code></pre>
+      <div id="table-map" class="result"></div>
+
+      <h2 id="filters">Filters</h2>
+      <p>
+        Name a property in <code>filters</code> to let people filter on it. The
+        widget finds the values that occur in your data and offers them as
+        checkboxes. Untick "Germany" below and the German radars leave the map
+        and the table.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#filter-map', {
+  data: 'registry.json',
+  filters: ['country'],
+})</code></pre>
+      <div id="filter-map" class="result"></div>
+      <p>
+        You can have several filters, and give each a <code>label</code>.
+        Within one filter the ticked values are alternatives: "Belgium" and
+        "France" shows both. Different filters narrow each other down:
+        "weather" and "Netherlands" shows only Dutch weather radars.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#filters-map', {
+  data: 'registry.json',
+  filters: [{ property: 'type', label: 'Radar type' }, 'country'],
+})</code></pre>
+      <div id="filters-map" class="result"></div>
+
+      <h2 id="dim">Hiding or dimming</h2>
+      <p>
+        By default, points that do not match the filters are hidden. With
+        <code>matchBehaviour: 'dim'</code> they stay on the map, faded, so the
+        matching ones are seen in context. The table lists matching points only
+        in both cases.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#dim-map', {
+  data: 'registry.json',
+  filters: ['country'],
+  matchBehaviour: 'dim',
+})</code></pre>
+      <div id="dim-map" class="result"></div>
+
+      <h2 id="colours">Colours and legend</h2>
+      <p>
+        <code>style.colorBy</code> names the property that decides the colour of
+        a marker. Each value gets a colour from a built-in palette that stays
+        readable for colour-blind people, and a legend appears on the map.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#colour-map', {
+  data: 'registry.json',
+  style: { colorBy: 'type' },
+})</code></pre>
+      <div id="colour-map" class="result"></div>
+      <p>
+        To choose colours yourself, add a <code>palette</code>. You only need to
+        list the values you care about; the others keep a built-in colour.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#palette-map', {
+  data: 'registry.json',
+  style: {
+    colorBy: 'type',
+    palette: { weather: '#7b3294', birdscan: '#008837' },
+  },
+})</code></pre>
+      <div id="palette-map" class="result"></div>
+
+      <h2 id="events">Reacting to the user</h2>
+      <p>
+        <code>onFilterchange</code> and <code>onViewchange</code> are called
+        when someone changes a filter or switches between map and table.
+        <code>mount()</code> also returns a handle: its <code>update()</code>
+        changes <code>matchBehaviour</code> or <code>table</code> on the running
+        widget, without losing the filters or the map position.
+      </p>
+      <p>
+        Change a filter or the view below and watch the line under the buttons.
+        Then untick a country and use the two buttons.
+      </p>
+<pre class="runnable"><code>const log = document.querySelector('#events-log')
+
+const widget = DeployMap.mount('#events-map', {
+  data: 'registry.json',
+  filters: ['country'],
+  onFilterchange: (state) => {
+    log.textContent = 'filterchange: ' + JSON.stringify(state)
+  },
+  onViewchange: (view) => {
+    log.textContent = 'viewchange: ' + view
+  },
+})
+
+document.querySelector('#events-hide').addEventListener('click', () => {
+  widget.update({ matchBehaviour: 'hide' })
+})
+document.querySelector('#events-dim').addEventListener('click', () => {
+  widget.update({ matchBehaviour: 'dim' })
+})</code></pre>
+      <p>
+        <button id="events-hide" type="button" class="btn btn-sm btn-outline-secondary">Hide non-matching points</button>
+        <button id="events-dim" type="button" class="btn btn-sm btn-outline-secondary">Dim non-matching points</button>
+      </p>
+      <p><code id="events-log">Nothing yet.</code></p>
+      <div id="events-map" class="result"></div>
+
+      <h2 id="tiles">Another background map</h2>
+      <p>
+        The default background is muted, so the markers stand out. To use
+        another one, give <code>tileLayer</code> the URL template of the tiles
+        and the attribution their provider asks for. Check the provider's terms
+        of use first.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#tiles-map', {
+  data: 'registry.json',
+  tileLayer: {
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&amp;copy; OpenStreetMap contributors',
+    maxZoom: 19,
+  },
+})</code></pre>
+      <div id="tiles-map" class="result"></div>
+
+      <h2 id="styling">Styling</h2>
+      <p>
+        The buttons, checkboxes and table are written with
+        <a href="https://getbootstrap.com/">Bootstrap 5.3</a> class names. You
+        do not need to do anything about that:
+      </p>
+      <ul>
+        <li>
+          If your page already uses Bootstrap 5.3, like this one, the widget
+          uses it and follows your theme.
+        </li>
+        <li>
+          Otherwise the widget brings its own copy of the parts it needs. Those
+          styles only apply inside the widget, so the rest of your page does not
+          change. See the <a href="bare.html">demo on a page without Bootstrap</a>.
+        </li>
+      </ul>
+      <p>
+        The <code>bootstrap</code> option overrides this: <code>'bundled'</code>
+        always uses the widget's own copy, <code>'host'</code> never adds it.
+      </p>
+
+      <h2 id="together">Putting it together</h2>
+      <p>All of the above in one widget.</p>
+<pre class="runnable"><code>DeployMap.mount('#full-map', {
+  data: 'registry.json',
+  table: {
+    columns: [
+      { property: 'radar_id', label: 'Code' },
+      'type',
+      'country',
+      'location',
+      'start',
+      'end',
+    ],
+  },
+  filters: [{ property: 'type', label: 'Radar type' }, 'country'],
+  matchBehaviour: 'dim',
+  style: { colorBy: 'type' },
+})</code></pre>
+      <div id="full-map" class="result"></div>
+    </main>
+    <script src="tutorial.js"></script>
+  </body>
+</html>

@@ -40,11 +40,16 @@ export interface DeployMapHandle {
   unmount: () => void
 }
 
+let mountCount = 0
+
 /** Mount the widget in `target` (a CSS selector or an element). */
 export function mount(target: string | Element, config: DeployMapConfig): DeployMapHandle {
   // Shallow: only the top-level options are tracked, the data itself is left alone.
   const props = shallowReactive({ ...config })
   const app = createApp({ render: () => h(DeployMap, props) })
+  // Each mount() is its own Vue app, and their generated element ids would be
+  // identical: a filter button would open the popover of another widget.
+  app.config.idPrefix = `deploy-map-${++mountCount}`
   app.mount(target)
   return {
     update: (options) => void Object.assign(props, options),
