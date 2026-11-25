@@ -50,6 +50,7 @@ props.
 | `filters` | Filters to offer: property names, or `{ property, label, id }`. Each lists the distinct values of its property as checkboxes. Options of one filter combine with OR, filters with AND. Default: none. |
 | `style` | `{ colorBy, palette }`. `colorBy` names the property that decides a marker's colour; `palette` maps values to colours, and values it does not list get one from a built-in colour-blind-safe palette. A legend is shown when `colorBy` is set. Default: one colour for all points, no legend. |
 | `matchBehaviour` | `'hide'` (default) or `'dim'`: what the map does with points that do not match. The table always lists matching points only. |
+| `bootstrap` | Where the Bootstrap styles come from: `'auto'` (default), `'host'` or `'bundled'`. See [Styling](#styling). |
 | `onFilterchange` | Called with the selected options per filter id when the user changes a filter. |
 | `onViewchange` | Called with `'map'` or `'table'` when the user switches view. |
 
@@ -58,15 +59,40 @@ Only `data` is required; everything else has a default.
 The widget fills its container, with a minimum height of 400px. Markup uses
 Bootstrap 5.3 classes, so it picks up the styles of a page that has Bootstrap.
 
+## Styling
+
+The widget's markup uses Bootstrap 5.3 classes. With the default
+`bootstrap: 'auto'` it works on any page:
+
+- If the page already has Bootstrap 5.3, the widget uses it and follows the
+  page's theme. Nothing is added to the page.
+- Otherwise the widget adds its own copy of the Bootstrap parts it needs
+  (about 9 kB gzipped) in a `<style>` tag. Every rule is scoped to the widget,
+  so the rest of the page is not affected.
+
+To decide yourself, set `bootstrap: 'bundled'` (always add the bundled styles)
+or `bootstrap: 'host'` (never add anything). With `'host'` on a page without
+Bootstrap, for example because inline styles are not allowed there, link the
+same styles as a file:
+
+```html
+<link rel="stylesheet" href="dist/deploy-map.bootstrap.css">
+```
+
+The widget never uses Bootstrap's JavaScript.
+
 ## Development
 
 ```sh
 npm install
-npm run build      # dist/deploy-map.js (IIFE), dist/deploy-map.esm.js, dist/deploy-map.css
+npm run build      # dist/: deploy-map.js (IIFE), deploy-map.esm.js, deploy-map.css, deploy-map.bootstrap.css
 npm test
 npm run lint
 npm run typecheck
+npx playwright install   # once, downloads the test browsers
+npm run test:e2e         # smoke tests of the built bundle in Chromium, Firefox and WebKit
 ```
 
 To see the demo, build, serve the repository root with any static server and
-open `demo/index.html`.
+open `demo/index.html` (a page with Bootstrap) or `demo/bare.html` (a page
+without).

@@ -15,4 +15,12 @@ export default tseslint.config(
     // TypeScript already reports undefined names, and knows the DOM types.
     rules: { 'no-undef': 'off' },
   },
+  {
+    // Plain browser script loaded after the widget bundle.
+    files: ['demo/**/*.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: { DeployMap: 'readonly', document: 'readonly', console: 'readonly' },
+    },
+  },
 )
