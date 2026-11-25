@@ -12,7 +12,13 @@ import {
   type FilterConfig,
   type FilterState,
 } from './filters'
-import { createMap, type MapHandle, type MatchBehaviour, type TileLayerConfig } from './leaflet'
+import {
+  createMap,
+  type MapHandle,
+  type MatchBehaviour,
+  type ScrollZoom,
+  type TileLayerConfig,
+} from './leaflet'
 import { resolveStyle, type StyleConfig } from './style'
 import { resolveColumns, type ColumnConfig } from './table'
 
@@ -38,8 +44,10 @@ const props = withDefaults(
     style?: StyleConfig
     /** Where the Bootstrap styles come from. Read once, when the widget mounts. */
     bootstrap?: BootstrapMode
+    /** When the scroll wheel zooms the map. Read once, when the widget mounts. */
+    scrollZoom?: ScrollZoom
   }>(),
-  { matchBehaviour: 'hide', bootstrap: 'auto' },
+  { matchBehaviour: 'hide', bootstrap: 'auto', scrollZoom: 'afterClick' },
 )
 
 const emit = defineEmits<{
@@ -96,6 +104,7 @@ onMounted(async () => {
     map = createMap(mapEl.value, loaded, {
       colorOf: style.value.colorOf,
       tileLayer: props.tileLayer,
+      scrollZoom: props.scrollZoom,
     })
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)

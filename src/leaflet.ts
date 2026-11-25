@@ -21,6 +21,15 @@ export const DEFAULT_TILE_LAYER: TileLayerConfig = {
   maxZoom: 16,
 }
 
+/**
+ * When the scroll wheel zooms the map:
+ * - 'afterClick': only once the map has been clicked, until the pointer leaves
+ *   it. Scrolling a page past the map then keeps scrolling the page.
+ * - 'always': whenever the pointer is over the map. For a map that fills the page.
+ * - 'never'
+ */
+export type ScrollZoom = 'afterClick' | 'always' | 'never'
+
 /** What happens to points that do not match the filters. */
 export type MatchBehaviour = 'hide' | 'dim'
 
@@ -40,11 +49,20 @@ export function createMap(
   options: {
     colorOf: (feature: Feature<Point>) => string
     tileLayer?: TileLayerConfig
+    scrollZoom?: ScrollZoom
   },
 ): MapHandle {
-  const { colorOf, tileLayer = DEFAULT_TILE_LAYER } = options
+  const { colorOf, tileLayer = DEFAULT_TILE_LAYER, scrollZoom = 'afterClick' } = options
   // One shared canvas for all markers: a thousand or more points are expected.
-  const map = new LeafletMap(el, { renderer: new Canvas() })
+  const map = new LeafletMap(el, {
+    renderer: new Canvas(),
+    scrollWheelZoom: scrollZoom === 'always',
+  })
+  if (scrollZoom === 'afterClick') {
+    // The listeners go away with the element when the map is destroyed.
+    el.addEventListener('pointerdown', () => map.scrollWheelZoom.enable())
+    el.addEventListener('pointerleave', () => map.scrollWheelZoom.disable())
+  }
   new TileLayer(tileLayer.url, {
     attribution: tileLayer.attribution,
     maxZoom: tileLayer.maxZoom,

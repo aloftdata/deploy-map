@@ -57,6 +57,7 @@ props.
 | `style` | `{ colorBy, palette }`. `colorBy` names the property that decides a marker's colour; `palette` maps values to colours, and values it does not list get one from a built-in colour-blind-safe palette. A legend is shown when `colorBy` is set. Default: one colour for all points, no legend. |
 | `matchBehaviour` | `'hide'` (default) or `'dim'`: what the map does with points that do not match. The table always lists matching points only. |
 | `bootstrap` | Where the Bootstrap styles come from: `'auto'` (default), `'host'` or `'bundled'`. See [Styling](#styling). |
+| `scrollZoom` | When the scroll wheel zooms the map: `'afterClick'` (default) only once the map has been clicked and until the pointer leaves it, so scrolling a page past the map is not interrupted; `'always'`; or `'never'`. |
 | `onFilterchange` | Called with the selected options per filter id when the user changes a filter. |
 | `onViewchange` | Called with `'map'` or `'table'` when the user switches view. |
 
