@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>deploy-map demo</title>
+    <link rel="stylesheet" href="../dist/deploy-map.css">
+    <script src="../dist/deploy-map.js"></script>
+  </head>
+  <body>
+    <h1>deploy-map demo</h1>
+    <div id="map" style="height: 600px"></div>
+    <script>
+      DeployMap.mount('#map', { data: 'registry.json' })
+    </script>
+  </body>
+</html>
