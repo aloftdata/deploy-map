@@ -3,7 +3,7 @@ import DeployMap from './DeployMap.vue'
 import type { BootstrapMode } from './bootstrap'
 import type { PointCollection } from './data'
 import type { FilterConfig, FilterState } from './filters'
-import type { MatchBehaviour, TileLayerConfig } from './leaflet'
+import type { MatchBehaviour, ScrollZoom, TileLayerConfig } from './leaflet'
 import type { StyleConfig } from './style'
 import type { ColumnConfig } from './table'
 
@@ -25,6 +25,11 @@ export interface DeployMapConfig {
    * Bootstrap 5.3 when it has one, bundled styles scoped to the widget otherwise.
    */
   bootstrap?: BootstrapMode
+  /**
+   * When the scroll wheel zooms the map. Default 'afterClick': only once the
+   * map has been clicked, so scrolling a page past the map is not interrupted.
+   */
+  scrollZoom?: ScrollZoom
   /** Called when the user changes a filter, with the selected options per filter id. */
   onFilterchange?: (state: FilterState) => void
   /** Called when the user switches between map and table. */
@@ -65,6 +70,7 @@ export type {
   FilterState,
   MatchBehaviour,
   PointCollection,
+  ScrollZoom,
   StyleConfig,
   TileLayerConfig,
 }

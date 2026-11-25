@@ -232,6 +232,24 @@ document.querySelector('#events-dim').addEventListener('click', () => {
 })</code></pre>
       <div id="tiles-map" class="result"></div>
 
+      <h2 id="scroll">The scroll wheel</h2>
+      <p>
+        You may have noticed that scrolling this page does not zoom the maps
+        you pass over. The scroll wheel only zooms a map once you have clicked
+        it, and stops doing so when the pointer leaves it. The + and - buttons
+        always work.
+      </p>
+      <p>
+        For a map that fills the whole page there is nothing else to scroll, so
+        let the wheel zoom straight away with <code>scrollZoom: 'always'</code>.
+        <code>'never'</code> turns wheel zooming off.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#scroll-map', {
+  data: 'registry.json',
+  scrollZoom: 'always',
+})</code></pre>
+      <div id="scroll-map" class="result"></div>
+
       <h2 id="styling">Styling</h2>
       <p>
         The buttons, checkboxes and table are written with

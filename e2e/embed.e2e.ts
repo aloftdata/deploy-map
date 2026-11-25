@@ -128,3 +128,59 @@ test('tutorial: a filter in a later widget opens its own popover', async ({ page
   expect(Math.abs(popoverBox.y - (buttonBox.y + buttonBox.height))).toBeLessThan(12)
   expect(await page.locator('[id]').evaluateAll((els) => els.length - new Set(els.map((el) => el.id)).size)).toBe(0)
 })
+
+/**
+ * A map embedded in a page must not swallow the scroll wheel: someone scrolling
+ * down the page with the pointer passing over the map expects the page to keep
+ * moving, not the map to zoom. Only after a click on the map (a sign they mean
+ * to use it) does the wheel zoom, and that ends when the pointer leaves.
+ */
+test('the scroll wheel scrolls the page until the map is clicked', async ({ page }) => {
+  await page.goto('/demo/tutorial.html')
+  const map = page.locator('#first-map .leaflet-container')
+  await map.scrollIntoViewIfNeeded()
+  await expect(map.locator('canvas')).toBeVisible()
+  // Leaflet keeps the current zoom in this element's transform.
+  const zoomState = () => map.locator('.leaflet-proxy').getAttribute('style')
+
+  const box = (await map.boundingBox())!
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  const [zoomBefore, scrollBefore] = [await zoomState(), await page.evaluate(() => scrollY)]
+  await page.mouse.wheel(0, 200)
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(scrollBefore)
+  expect(await zoomState()).toBe(zoomBefore)
+
+  // The page has moved under the pointer, and may still be gliding: wait for
+  // it to stop, then go back onto the map and click it.
+  await settleScroll(page)
+  const moved = (await map.boundingBox())!
+  await page.mouse.click(moved.x + moved.width / 2, moved.y + moved.height / 2)
+  const zoomClicked = await zoomState()
+  // Keep turning the wheel, as a person does. A single wheel event sent within
+  // milliseconds of the click can be missed in WebKit, which learns about the
+  // newly added wheel listener a moment later.
+  await expect(async () => {
+    await page.mouse.wheel(0, 100)
+    expect(await zoomState()).not.toBe(zoomClicked)
+  }).toPass()
+
+  await page.mouse.move(2, 2) // leave the map
+  const [zoomLeft, scrollLeft] = [await zoomState(), await page.evaluate(() => scrollY)]
+  await page.mouse.move(moved.x + moved.width / 2, moved.y + moved.height / 2)
+  await page.mouse.wheel(0, 200)
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(scrollLeft)
+  expect(await zoomState()).toBe(zoomLeft)
+})
+
+/** Resolve once the page has stopped scrolling (two equal positions 100 ms apart). */
+async function settleScroll(page: Page) {
+  let previous = -1
+  await expect
+    .poll(async () => {
+      const current = await page.evaluate(() => scrollY)
+      const settled = current === previous
+      previous = current
+      return settled
+    }, { intervals: [100] })
+    .toBe(true)
+}
