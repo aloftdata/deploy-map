@@ -19,3 +19,28 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # The demo page loads ../dist, so the site keeps the repository layout.
+      # The root only redirects to the demo.
+      - name: Assemble demo site
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir _site
+          cp -r demo dist _site/
+          echo '<!doctype html><meta http-equiv="refresh" content="0; url=demo/">' > _site/index.html
+      - uses: actions/upload-pages-artifact@v5
+        if: github.ref == 'refs/heads/main'
+
+  # Publishes the demo to GitHub Pages, only from main and only after the checks pass.
+  deploy-demo:
+    needs: check
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

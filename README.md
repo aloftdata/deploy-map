@@ -8,6 +8,8 @@ all work the same way.
 
 > Early development: only the map with markers exists so far.
 
+Demo: <https://aloftdata.github.io/deploy-map/>
+
 ## Usage
 
 With a script tag (Vue and Leaflet are included in the bundle):
