@@ -16,6 +16,10 @@ export default tseslint.config(
     rules: { 'no-undef': 'off' },
   },
   {
+    files: ['e2e/**/*.mjs'],
+    languageOptions: { globals: { process: 'readonly', URL: 'readonly' } },
+  },
+  {
     // Plain browser script loaded after the widget bundle.
     files: ['demo/**/*.js'],
     languageOptions: {
