@@ -2,6 +2,7 @@
 // it behind this wrapper keeps a fallback to 1.9.4 local to this file.
 import { Canvas, CircleMarker, GeoJSON, Map as LeafletMap, TileLayer } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import type { Feature, Point } from 'geojson'
 import type { PointCollection } from './data'
 
 export interface TileLayerConfig {
@@ -10,22 +11,38 @@ export interface TileLayerConfig {
   maxZoom?: number
 }
 
+// Esri Light Gray Canvas: a muted background that lets the markers stand out.
+// The attribution is the one the tile service declares. Beyond zoom 16 the
+// service only returns "map data not yet available" placeholders.
 export const DEFAULT_TILE_LAYER: TileLayerConfig = {
-  url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
   attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  maxZoom: 19,
+    'Esri, HERE, Garmin, &copy; OpenStreetMap contributors, and the GIS user community',
+  maxZoom: 16,
 }
 
-/**
- * Draw the points on a new map in `el`, zoomed to fit them.
- * Returns a function that destroys the map.
- */
+/** What happens to points that do not match the filters. */
+export type MatchBehaviour = 'hide' | 'dim'
+
+export interface MapHandle {
+  /** Show the points that pass `isMatch` normally, and hide or dim the others. */
+  update: (isMatch: (feature: Feature<Point>) => boolean, behaviour: MatchBehaviour) => void
+  destroy: () => void
+}
+
+const SOLID = { opacity: 1, fillOpacity: 0.2 } // Leaflet's own path defaults
+const DIMMED = { opacity: 0.4, fillOpacity: 0.05 }
+
+/** Draw the points on a new map in `el`, zoomed to fit them. */
 export function createMap(
   el: HTMLElement,
   points: PointCollection,
-  tileLayer: TileLayerConfig = DEFAULT_TILE_LAYER,
-): () => void {
+  options: {
+    colorOf: (feature: Feature<Point>) => string
+    tileLayer?: TileLayerConfig
+  },
+): MapHandle {
+  const { colorOf, tileLayer = DEFAULT_TILE_LAYER } = options
   // One shared canvas for all markers: a thousand or more points are expected.
   const map = new LeafletMap(el, { renderer: new Canvas() })
   new TileLayer(tileLayer.url, {
@@ -33,8 +50,13 @@ export function createMap(
     maxZoom: tileLayer.maxZoom,
   }).addTo(map)
 
+  const markers: [Feature<Point>, CircleMarker][] = []
   const layer = new GeoJSON(points, {
-    pointToLayer: (_feature, latlng) => new CircleMarker(latlng, { radius: 6 }),
+    pointToLayer: (feature, latlng) => {
+      const marker = new CircleMarker(latlng, { radius: 6, color: colorOf(feature) })
+      markers.push([feature, marker])
+      return marker
+    },
   }).addTo(map)
 
   const bounds = layer.getBounds()
@@ -43,5 +65,17 @@ export function createMap(
   } else {
     map.setView([0, 0], 2) // no points: show the world
   }
-  return () => map.remove()
+
+  return {
+    update(isMatch, behaviour) {
+      for (const [feature, marker] of markers) {
+        const match = isMatch(feature)
+        const visible = match || behaviour === 'dim'
+        if (visible && !layer.hasLayer(marker)) layer.addLayer(marker)
+        if (!visible && layer.hasLayer(marker)) layer.removeLayer(marker)
+        marker.setStyle(match ? SOLID : DIMMED)
+      }
+    },
+    destroy: () => map.remove(),
+  }
 }
