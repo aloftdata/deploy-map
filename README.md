@@ -6,12 +6,16 @@ Give it a GeoJSON FeatureCollection of points and it draws them on a map. It is
 not tied to a domain: radars, camera traps, sensor networks and sampling sites
 all work the same way.
 
-> Early development: a map with coloured markers and a legend, a table view and filters so far.
+> Version 0.1: a map with coloured markers and a legend, a table view and filters.
+> Not on npm yet. Selecting a point, and more filter types, come next.
 
 - Demo: <https://aloftdata.github.io/deploy-map/>
 - Quick start tutorial: <https://aloftdata.github.io/deploy-map/demo/tutorial.html>
 
 ## Usage
+
+The [quick start tutorial](https://aloftdata.github.io/deploy-map/demo/tutorial.html)
+introduces the options one at a time, with live examples.
 
 With a script tag (Vue and Leaflet are included in the bundle):
 
@@ -25,7 +29,8 @@ With a script tag (Vue and Leaflet are included in the bundle):
 </script>
 ```
 
-As an ES module (`vue` and `leaflet` are regular dependencies):
+As an ES module, once the package is published (`vue` and `leaflet` are
+regular dependencies, and TypeScript types are included):
 
 ```js
 import { mount } from '@aloftdata/deploy-map'
@@ -57,8 +62,8 @@ props.
 
 Only `data` is required; everything else has a default.
 
-The widget fills its container, with a minimum height of 400px. Markup uses
-Bootstrap 5.3 classes, so it picks up the styles of a page that has Bootstrap.
+The widget fills its container, with a minimum height of 400px. Several
+widgets can live on one page.
 
 ## Styling
 
@@ -86,7 +91,7 @@ The widget never uses Bootstrap's JavaScript.
 
 ```sh
 npm install
-npm run build      # dist/: deploy-map.js (IIFE), deploy-map.esm.js, deploy-map.css, deploy-map.bootstrap.css
+npm run build      # dist/: deploy-map.js (IIFE), deploy-map.esm.js, the two CSS files, types/
 npm test
 npm run lint
 npm run typecheck
@@ -95,5 +100,5 @@ npm run test:e2e         # smoke tests of the built bundle in Chromium, Firefox 
 ```
 
 To see the demo, build, serve the repository root with any static server and
-open `demo/index.html` (a page with Bootstrap) or `demo/bare.html` (a page
-without).
+open `demo/index.html` (a page with Bootstrap), `demo/bare.html` (a page
+without) or `demo/tutorial.html`.

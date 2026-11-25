@@ -1,7 +1,21 @@
 {
   "name": "@aloftdata/deploy-map",
-  "version": "0.0.0",
-  "description": "JS library to show deployments on a map",
+  "version": "0.1.0",
+  "description": "Show a set of points on a map and in a table, with filters, colours and a legend",
+  "keywords": [
+    "map",
+    "leaflet",
+    "geojson",
+    "widget",
+    "filters",
+    "vue"
+  ],
+  "homepage": "https://aloftdata.github.io/deploy-map/",
+  "bugs": "https://github.com/aloftdata/deploy-map/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aloftdata/deploy-map.git"
+  },
   "license": "MIT",
   "type": "module",
   "files": [
@@ -9,29 +23,36 @@
   ],
   "main": "./dist/deploy-map.js",
   "module": "./dist/deploy-map.esm.js",
+  "types": "./dist/types/index.d.ts",
+  "unpkg": "./dist/deploy-map.js",
+  "jsdelivr": "./dist/deploy-map.js",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/deploy-map.esm.js",
       "default": "./dist/deploy-map.js"
     },
     "./dist/deploy-map.css": "./dist/deploy-map.css",
     "./dist/deploy-map.bootstrap.css": "./dist/deploy-map.bootstrap.css"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "vite build && vite build --mode esm",
+    "build": "vite build && vite build --mode esm && vue-tsc -p tsconfig.build.json",
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint .",
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@types/geojson": "^7946.0.16",
     "leaflet": "2.0.0-beta.5",
     "vue": "^3.5.46"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.1",
-    "@types/geojson": "^7946.0.16",
     "@types/node": "^26.6.10",
     "@vitejs/plugin-vue": "^6.0.11",
     "bootstrap": "~5.3.9",
