@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>deploy-map demo (no Bootstrap)</title>
+    <link rel="stylesheet" href="../dist/deploy-map.css">
+    <script src="../dist/deploy-map.js"></script>
+    <!-- A host with its own look, to show the widget does not change it. -->
+    <style>
+      body { max-width: 60rem; margin: 2rem auto; padding: 0 1rem; font-family: Georgia, serif; }
+    </style>
+  </head>
+  <body>
+    <h1>deploy-map demo (no Bootstrap)</h1>
+    <p>
+      This page has no Bootstrap. The widget brings its own styles, scoped to
+      itself. See also the <a href="index.html">page with Bootstrap</a>.
+    </p>
+    <!-- Demo-only control, outside the widget: it changes an option on the mounted widget. -->
+    <p>
+      Points that do not match the filters are
+      <label><input type="radio" name="match" value="hide" checked> hidden</label>
+      <label><input type="radio" name="match" value="dim"> dimmed</label>
+    </p>
+    <div id="map" style="height: 600px"></div>
+    <script src="demo.js"></script>
+  </body>
+</html>

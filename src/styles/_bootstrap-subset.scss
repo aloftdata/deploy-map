@@ -1,0 +1,34 @@
+// The parts of Bootstrap 5.3 the widget's markup uses. Compiled only through
+// bootstrap-scoped.scss, which nests everything under the widget root.
+
+// One breakpoint: the widget uses no responsive variants (.d-md-flex and such),
+// and generating them would multiply the size of the utilities.
+$grid-breakpoints: (xs: 0);
+$enable-dark-mode: false;
+
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+// Only the utilities found in the widget's templates. Add here when using a new one.
+$utilities: map-get-multiple(
+  $utilities,
+  ("shadow", "border", "align-items", "margin-bottom", "padding", "gap", "font-size",
+   "color", "background-color", "rounded", "display")
+);
+
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type"; // .list-unstyled, .small
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms/form-check";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/button-group";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/helpers/visually-hidden";
+@import "bootstrap/scss/helpers/color-bg"; // .text-bg-*
+@import "bootstrap/scss/utilities/api";

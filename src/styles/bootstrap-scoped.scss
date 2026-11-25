@@ -1,0 +1,9 @@
+// Bootstrap for hosts that do not have it: the subset the widget uses, with
+// every selector nested under the widget root so nothing reaches the host page.
+// The build then moves the rules Bootstrap puts on :root and body onto the
+// widget root itself (see vite.config.ts).
+@use "sass:meta";
+
+.deploy-map {
+  @include meta.load-css("bootstrap-subset");
+}

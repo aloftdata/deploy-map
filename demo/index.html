@@ -11,6 +11,10 @@
   </head>
   <body class="container py-3">
     <h1>deploy-map demo</h1>
+    <p>
+      This page has Bootstrap 5.3, and the widget uses it. See also the
+      <a href="bare.html">page without Bootstrap</a>.
+    </p>
     <!-- Demo-only control, outside the widget: it changes an option on the mounted widget. -->
     <div class="d-flex align-items-center gap-2 mb-3">
       <span id="match-label">Points that do not match the filters are</span>
@@ -22,28 +26,6 @@
       </div>
     </div>
     <div id="map" style="height: 600px"></div>
-    <script>
-      // Only `data` is required. Without `table`, every plain property becomes a column.
-      const widget = DeployMap.mount('#map', {
-        data: 'registry.json',
-        filters: [{ property: 'type', label: 'Radar type' }, 'country'],
-        style: { colorBy: 'type' },
-        onFilterchange: (state) => console.log('filterchange', state),
-        onViewchange: (view) => console.log('viewchange', view),
-        table: {
-          columns: [
-            { property: 'radar_id', label: 'Code' },
-            'type',
-            'country',
-            'location',
-            'start',
-            'end',
-          ],
-        },
-      })
-      for (const radio of document.querySelectorAll('input[name=match]')) {
-        radio.addEventListener('change', () => widget.update({ matchBehaviour: radio.value }))
-      }
-    </script>
+    <script src="demo.js"></script>
   </body>
 </html>

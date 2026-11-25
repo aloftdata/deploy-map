@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vu
 import DataTable from './DataTable.vue'
 import FilterBar from './FilterBar.vue'
 import MapLegend from './MapLegend.vue'
+import { ensureBootstrap, type BootstrapMode } from './bootstrap'
 import { loadData, type PointCollection } from './data'
 import {
   initialState,
@@ -35,8 +36,10 @@ const props = withDefaults(
     matchBehaviour?: MatchBehaviour
     /** Marker colours. One colour for all points by default. */
     style?: StyleConfig
+    /** Where the Bootstrap styles come from. Read once, when the widget mounts. */
+    bootstrap?: BootstrapMode
   }>(),
-  { matchBehaviour: 'hide' },
+  { matchBehaviour: 'hide', bootstrap: 'auto' },
 )
 
 const emit = defineEmits<{
@@ -83,6 +86,7 @@ function setView(next: View) {
 }
 
 onMounted(async () => {
+  ensureBootstrap(props.bootstrap)
   try {
     const loaded = await loadData(props.data)
     // mapEl is gone if the component was unmounted while the data was loading.
