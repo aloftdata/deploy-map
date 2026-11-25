@@ -1,0 +1,489 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.4061,
+          51.0692
+        ]
+      },
+      "properties": {
+        "deployment_id": "behel-1",
+        "radar_id": "behel",
+        "type": "weather",
+        "country": "Belgium",
+        "location": "Helchteren",
+        "start": "2018",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.0641,
+          51.1919
+        ]
+      },
+      "properties": {
+        "deployment_id": "bejab-1",
+        "radar_id": "bejab",
+        "type": "weather",
+        "country": "Belgium",
+        "location": "Jabbeke",
+        "start": "2012",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.5044,
+          49.9135
+        ]
+      },
+      "properties": {
+        "deployment_id": "bewid-1",
+        "radar_id": "bewid",
+        "type": "weather",
+        "country": "Belgium",
+        "location": "Wideumont",
+        "start": "2001",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.455,
+          50.9055
+        ]
+      },
+      "properties": {
+        "deployment_id": "bezav-1",
+        "radar_id": "bezav",
+        "type": "weather",
+        "country": "Belgium",
+        "location": "Zaventem",
+        "start": "2003",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.916,
+          52.366
+        ]
+      },
+      "properties": {
+        "deployment_id": "bs290-1",
+        "radar_id": "bs290",
+        "type": "birdscan",
+        "country": "Netherlands",
+        "location": "Artis",
+        "start": "2021-03-12",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.22,
+          52.07
+        ]
+      },
+      "properties": {
+        "deployment_id": "bs291-1",
+        "radar_id": "bs291",
+        "type": "birdscan",
+        "country": "Netherlands",
+        "location": "Kijkduin",
+        "start": null,
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.955,
+          52.355
+        ]
+      },
+      "properties": {
+        "deployment_id": "bs291-2",
+        "radar_id": "bs291",
+        "type": "birdscan",
+        "country": "Netherlands",
+        "location": "Science Park",
+        "start": null,
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.7483,
+          53.564
+        ]
+      },
+      "properties": {
+        "deployment_id": "deasb-1",
+        "radar_id": "deasb",
+        "type": "weather",
+        "country": "Germany",
+        "location": "Isle of Borkum",
+        "start": "2018",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.0237,
+          53.3387
+        ]
+      },
+      "properties": {
+        "deployment_id": "deemd-1",
+        "radar_id": "deemd",
+        "type": "weather",
+        "country": "Germany",
+        "location": "Emden",
+        "start": "1994",
+        "end": "2018",
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.9671,
+          51.4056
+        ]
+      },
+      "properties": {
+        "deployment_id": "deess-1",
+        "radar_id": "deess",
+        "type": "weather",
+        "country": "Germany",
+        "location": "Essen",
+        "start": "2012",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.802,
+          51.3112
+        ]
+      },
+      "properties": {
+        "deployment_id": "defld-1",
+        "radar_id": "defld",
+        "type": "weather",
+        "country": "Germany",
+        "location": "Flechtdorf",
+        "start": "2014",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.6945,
+          52.4601
+        ]
+      },
+      "properties": {
+        "deployment_id": "dehnr-1",
+        "radar_id": "dehnr",
+        "type": "weather",
+        "country": "Germany",
+        "location": "Hannover",
+        "start": "2014",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.5485,
+          50.1097
+        ]
+      },
+      "properties": {
+        "deployment_id": "denhb-1",
+        "radar_id": "denhb",
+        "type": "weather",
+        "country": "Germany",
+        "location": "Neuheilenbach",
+        "start": "2014",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.7129,
+          49.9847
+        ]
+      },
+      "properties": {
+        "deployment_id": "deoft-1",
+        "radar_id": "deoft",
+        "type": "weather",
+        "country": "Germany",
+        "location": "Offenthal",
+        "start": "2011",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.8347,
+          50.136
+        ]
+      },
+      "properties": {
+        "deployment_id": "frabb-1",
+        "radar_id": "frabb",
+        "type": "weather",
+        "country": "France",
+        "location": "Abbeville",
+        "start": "2009",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.8118,
+          50.1283
+        ]
+      },
+      "properties": {
+        "deployment_id": "frave-1",
+        "radar_id": "frave",
+        "type": "weather",
+        "country": "France",
+        "location": "Avesnes",
+        "start": "2005",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.0083,
+          48.7746
+        ]
+      },
+      "properties": {
+        "deployment_id": "frtra-1",
+        "radar_id": "frtra",
+        "type": "weather",
+        "country": "France",
+        "location": "Trappes",
+        "start": "2004",
+        "end": null,
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.1783,
+          52.1017
+        ]
+      },
+      "properties": {
+        "deployment_id": "nldbl-1",
+        "radar_id": "nldbl",
+        "type": "weather",
+        "country": "Netherlands",
+        "location": "De Bilt",
+        "start": "1981",
+        "end": "2017",
+        "datasets": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7906,
+          52.9528
+        ]
+      },
+      "properties": {
+        "deployment_id": "nldhl-1",
+        "radar_id": "nldhl",
+        "type": "weather",
+        "country": "Netherlands",
+        "location": "Den Helder",
+        "start": "2006",
+        "end": null,
+        "datasets": [
+          {
+            "dataset_id": "BALTRAD_VPTS",
+            "start": "2008",
+            "end": "2025",
+            "coverage_source": "declared"
+          },
+          {
+            "dataset_id": "UVA_VPTS",
+            "start": "2008",
+            "end": "2025",
+            "coverage_source": "declared"
+          },
+          {
+            "dataset_id": "RMI_DATASET_CROW",
+            "start": "2008",
+            "end": "2025",
+            "coverage_source": "declared"
+          },
+          {
+            "dataset_id": "ECOG-04003",
+            "start": "2008",
+            "end": "2025",
+            "coverage_source": "declared"
+          },
+          {
+            "dataset_id": "RADAR-VOLUME-DENHELDER-2.0",
+            "start": "2008",
+            "end": "2025",
+            "coverage_source": "declared"
+          }
+        ],
+        "alt_codes": [
+          "6234",
+          "1207"
+        ],
+        "band": "C",
+        "frequency": 5.625,
+        "polarization": "dual",
+        "gain": 45,
+        "beamwidth": 0.92,
+        "antenna_diameter": 4.2,
+        "max_range": 320,
+        "elevation": 52,
+        "antenna_height": 55
+      }
+    }
+  ],
+  "datasets": {
+    "BALTRAD_VPTS": {
+      "title": "BALTRAD_VPTS - Vertical profiles of biological targets derived from",
+      "data_type": "vpts",
+      "access": {
+        "level": "public"
+      }
+    },
+    "UVA_VPTS": {
+      "title": "UVA_VPTS - Vertical profiles of biological targets derived from",
+      "data_type": "vpts",
+      "access": {
+        "level": "public"
+      }
+    },
+    "RMI_DATASET_CROW": {
+      "title": "RMI_DATASET_CROW - Bird density profiles derived from weather radar",
+      "data_type": "vpts",
+      "access": {
+        "level": "public"
+      }
+    },
+    "ECOG-04003": {
+      "title": "ECOG-04003 - Supplementary material for 'Revealing patterns of nocturnal",
+      "data_type": "vpts",
+      "access": {
+        "level": "public"
+      }
+    },
+    "RADAR-VOLUME-DENHELDER-2.0": {
+      "title": "RADAR-VOLUME-DENHELDER 2.0 - Precipitation - radar 5 minute full",
+      "data_type": "pvol",
+      "access": {
+        "level": "public",
+        "procedure": "API key"
+      }
+    }
+  },
+  "software": [
+    {
+      "software_id": "crow",
+      "title": "CROW - Aloft",
+      "kind": "visualization",
+      "access": "online",
+      "applies_to": {
+        "type": "weather"
+      },
+      "tip": "See data from last day"
+    },
+    {
+      "software_id": "getrad",
+      "title": "getRad: Download Radar Data for Biological Research",
+      "kind": "access",
+      "access": "R",
+      "applies_to": {
+        "type": "weather"
+      },
+      "tip": "Use get_pvol() or get_vpts()"
+    }
+  ]
+}
