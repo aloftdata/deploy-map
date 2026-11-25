@@ -9,10 +9,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   use: { baseURL: `http://localhost:${PORT}` },
   webServer: {
-    command: `python3 -m http.server ${PORT}`,
+    command: `node e2e/serve.mjs ${PORT}`,
     url: `http://localhost:${PORT}/demo/bare.html`,
     reuseExistingServer: !process.env.CI,
-    stderr: 'ignore', // http.server logs every request there
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

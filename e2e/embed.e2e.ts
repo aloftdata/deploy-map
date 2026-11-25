@@ -7,6 +7,7 @@ test.beforeEach(async ({ page }) => {
   // Keep the tests offline: no map tiles, and the CDN Bootstrap of the demo
   // page is served from node_modules.
   await page.route('**/server.arcgisonline.com/**', (route) => route.abort())
+  await page.route('**/tile.openstreetmap.org/**', (route) => route.abort())
   await page.route('**/cdn.jsdelivr.net/**/bootstrap.min.css', (route) =>
     route.fulfill({
       path: 'node_modules/bootstrap/dist/css/bootstrap.min.css',
@@ -89,3 +90,41 @@ for (const path of ['/demo/bare.html', '/demo/index.html']) {
     await expect(page.locator('.deploy-map tbody tr')).toHaveCount(16)
   })
 }
+
+/**
+ * The tutorial runs its examples from the code it displays. Every example must
+ * therefore produce a working widget: a typo in a code block, or an option the
+ * widget no longer accepts, would otherwise show readers a broken tutorial.
+ */
+test('tutorial: every example renders a widget without errors', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await page.goto('/demo/tutorial.html')
+  const examples = await page.locator('pre.runnable').count()
+  expect(examples).toBeGreaterThan(5)
+  await expect(page.locator('.result .deploy-map canvas')).toHaveCount(examples)
+  await expect(page.locator('.deploy-map [role=alert]')).toHaveCount(0)
+  expect(errors).toEqual([])
+})
+
+/**
+ * Several widgets on one page must not share element ids. Each widget is its
+ * own Vue app, and their generated ids used to be identical, so the filter
+ * button of a later widget opened the popover of the first one. The last
+ * tutorial example has the same filters as earlier ones: its button must open
+ * its own popover, right under it.
+ */
+test('tutorial: a filter in a later widget opens its own popover', async ({ page }) => {
+  await page.goto('/demo/tutorial.html')
+  const widget = page.locator('#full-map')
+  await expect(widget.locator('canvas')).toBeVisible()
+  const button = widget.getByRole('button', { name: 'Radar type' })
+  await button.click()
+  const popover = widget.locator('[popover]:popover-open')
+  await expect(popover).toBeVisible()
+  const buttonBox = (await button.boundingBox())!
+  const popoverBox = (await popover.boundingBox())!
+  expect(Math.abs(popoverBox.x - buttonBox.x)).toBeLessThan(2)
+  expect(Math.abs(popoverBox.y - (buttonBox.y + buttonBox.height))).toBeLessThan(12)
+  expect(await page.locator('[id]').evaluateAll((els) => els.length - new Set(els.map((el) => el.id)).size)).toBe(0)
+})
