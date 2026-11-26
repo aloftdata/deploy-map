@@ -191,7 +191,18 @@ async function settleScroll(page: Page) {
  * outline. Pixels covered by something else (zoom buttons, legend) are skipped.
  */
 async function findMarker(page: Page): Promise<{ x: number; y: number }> {
-  const point = await page.locator('.deploy-map canvas').evaluate((canvas: HTMLCanvasElement) => {
+  // The canvas exists before Leaflet has painted the markers on it (it draws
+  // on the next animation frame), so keep looking until one shows up.
+  let point: { x: number; y: number } | null = null
+  await expect(async () => {
+    point = await scanForMarker(page)
+    expect(point, 'a marker on the canvas').not.toBeNull()
+  }).toPass()
+  return point!
+}
+
+function scanForMarker(page: Page): Promise<{ x: number; y: number } | null> {
+  return page.locator('.deploy-map canvas').evaluate((canvas: HTMLCanvasElement) => {
     const { data, width, height } = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height)
     const box = canvas.getBoundingClientRect()
     // The canvas takes no pointer events itself: Leaflet hit-tests on the map element.
@@ -207,8 +218,6 @@ async function findMarker(page: Page): Promise<{ x: number; y: number }> {
     }
     return null
   })
-  if (!point) throw new Error('no marker found on the canvas')
-  return point
 }
 
 /**
