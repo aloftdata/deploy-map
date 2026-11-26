@@ -334,3 +334,43 @@ test('the panel lists all properties by default and accepts custom content', asy
   await custom.getByRole('button', { name: 'behel-1', exact: true }).click()
   await expect(custom.getByRole('complementary')).toContainText('Custom content for behel')
 })
+
+/**
+ * The reason permalinks exist: a link to a specific radar must open the
+ * widget with that radar's panel. A later change of the address (an edited
+ * URL, or a link to the same page) must be followed too.
+ */
+test('a link to a point opens the widget with its panel', async ({ page }) => {
+  await openDemo(page, '/demo/index.html#point=nldhl-1')
+  await expect(page.getByRole('complementary', { name: 'Den Helder' })).toBeVisible()
+
+  await page.evaluate(() => (location.hash = 'point=behel-1'))
+  await expect(page.getByRole('complementary', { name: 'Helchteren' })).toBeVisible()
+})
+
+/**
+ * What the user sets up must survive a reload through the address alone:
+ * selection, table view and a narrowed filter. Closing the panel and undoing
+ * the rest must leave a clean address, so the widget does not litter the URL.
+ */
+test('the address follows selection, view and filters, and restores them', async ({ page }) => {
+  await openDemo(page, '/demo/index.html')
+  await page.getByRole('button', { name: 'Radar type' }).click()
+  await page.getByLabel('BirdScan radar').uncheck()
+  await page.keyboard.press('Escape')
+  await page.getByRole('button', { name: 'Table', exact: true }).click()
+  await page.getByRole('button', { name: 'nldhl', exact: true }).click()
+  await expect(page).toHaveURL(/#point=nldhl-1&view=table&f\.type=weather$/)
+
+  await page.reload()
+  const panel = page.getByRole('complementary', { name: 'Den Helder' })
+  await expect(panel).toBeVisible()
+  await expect(page.locator('tr.table-active')).toContainText('nldhl')
+  await expect(page.getByRole('button', { name: 'Radar type' })).toContainText('1/2')
+
+  await panel.getByRole('button', { name: 'Close' }).click()
+  await page.getByRole('button', { name: 'Map', exact: true }).click()
+  await page.getByRole('button', { name: 'Radar type' }).click()
+  await page.getByLabel('BirdScan radar').check()
+  await expect(page).toHaveURL(/index\.html$/)
+})

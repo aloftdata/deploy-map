@@ -4,6 +4,9 @@ const widget = DeployMap.mount('#map', {
   data: 'registry.json',
   filters: [{ property: 'type', label: 'Radar type' }, 'country'],
   style: { colorBy: 'type' },
+  // The page's address follows selection, filters and view, and restores them.
+  permalink: true,
+  idProperty: 'deployment_id',
   // Display text for raw values, used by the filters, legend, table and panel.
   valueLabels: { type: { weather: 'Weather radar', birdscan: 'BirdScan radar' } },
   // Without `panel`, the panel lists every plain property.
