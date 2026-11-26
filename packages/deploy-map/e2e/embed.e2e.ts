@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/tile.openstreetmap.org/**', (route) => route.abort())
   await page.route('**/cdn.jsdelivr.net/**/bootstrap.min.css', (route) =>
     route.fulfill({
-      path: 'node_modules/bootstrap/dist/css/bootstrap.min.css',
+      path: '../../node_modules/bootstrap/dist/css/bootstrap.min.css', // workspace root
       contentType: 'text/css',
     }),
   )
