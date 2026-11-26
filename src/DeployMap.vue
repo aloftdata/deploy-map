@@ -22,7 +22,8 @@ import {
   type TileLayerConfig,
 } from './leaflet'
 import { resolveStyle, type StyleConfig } from './style'
-import { resolveColumns, type ColumnConfig } from './table'
+import type { PanelConfig } from './panel'
+import { resolveColumns, type ColumnConfig, type ValueLabels } from './table'
 
 const VIEWS = [
   { id: 'map', label: 'Map' },
@@ -44,6 +45,10 @@ const props = withDefaults(
     matchBehaviour?: MatchBehaviour
     /** Marker colours. One colour for all points by default. */
     style?: StyleConfig
+    /** Text to show instead of the data's values, per property: filters, legend, table, panel. */
+    valueLabels?: ValueLabels
+    /** The panel of a selected point. Default: every property holding a plain value. */
+    panel?: PanelConfig
     /** Where the Bootstrap styles come from. Read once, when the widget mounts. */
     bootstrap?: BootstrapMode
     /** When the scroll wheel zooms the map. Read once, when the widget mounts. */
@@ -75,7 +80,7 @@ let map: MapHandle | undefined
 const features = computed(() => points.value?.features ?? [])
 const columns = computed(() => resolveColumns(features.value, props.table?.columns))
 const filters = computed(() => resolveFilters(features.value, props.filters))
-const style = computed(() => resolveStyle(features.value, props.style))
+const style = computed(() => resolveStyle(features.value, props.style, props.valueLabels))
 // The table always lists matching points only, whatever `matchBehaviour` is.
 const matching = computed(() =>
   features.value.filter((feature) => matches(feature, filters.value, filterState.value)),
@@ -140,7 +145,12 @@ onBeforeUnmount(() => map?.destroy())
     <p v-if="error" class="alert alert-danger" role="alert">{{ error }}</p>
     <template v-else>
       <div class="deploy-map__toolbar">
-        <FilterBar :filters="filters" :model-value="filterState" @update:model-value="onFilterChange" />
+        <FilterBar
+          :filters="filters"
+          :model-value="filterState"
+          :value-labels="valueLabels"
+          @update:model-value="onFilterChange"
+        />
         <div class="btn-group btn-group-sm" role="group" aria-label="View">
           <button
             v-for="option in VIEWS"
@@ -169,9 +179,19 @@ onBeforeUnmount(() => map?.destroy())
           :features="matching"
           :columns="columns"
           :selected="selected"
+          :value-labels="valueLabels"
           @select="select"
         />
-        <SidePanel v-if="selected" :feature="selected" @close="select(undefined)" />
+        <SidePanel
+          v-if="selected"
+          :feature="selected"
+          :config="panel"
+          :value-labels="valueLabels"
+          @close="select(undefined)"
+        >
+          <!-- For hosts using the Vue component: their own panel content. -->
+          <slot v-if="$slots.panel" name="panel" :feature="selected" />
+        </SidePanel>
       </div>
     </template>
   </div>

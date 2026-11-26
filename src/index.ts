@@ -6,7 +6,8 @@ import type { PointCollection } from './data'
 import type { FilterConfig, FilterState } from './filters'
 import type { MatchBehaviour, ScrollZoom, TileLayerConfig } from './leaflet'
 import type { StyleConfig } from './style'
-import type { ColumnConfig } from './table'
+import type { PanelConfig } from './panel'
+import type { ColumnConfig, ValueLabels } from './table'
 
 export interface DeployMapConfig {
   /** URL of a GeoJSON FeatureCollection of points, or the collection itself. */
@@ -21,6 +22,16 @@ export interface DeployMapConfig {
   matchBehaviour?: MatchBehaviour
   /** Marker colours. One colour for all points by default. */
   style?: StyleConfig
+  /**
+   * Text to show instead of the data's values, per property:
+   * `{ type: { weather: 'Weather radar' } }`. Used by filters, legend, table and panel.
+   */
+  valueLabels?: ValueLabels
+  /**
+   * The panel of a selected point: its title, sections of properties, or
+   * custom content. Default: every property holding a plain value.
+   */
+  panel?: PanelConfig
   /**
    * Where the Bootstrap styles come from. Default 'auto': the host page's
    * Bootstrap 5.3 when it has one, bundled styles scoped to the widget otherwise.
@@ -72,8 +83,10 @@ export type {
   FilterConfig,
   FilterState,
   MatchBehaviour,
+  PanelConfig,
   PointCollection,
   ScrollZoom,
   StyleConfig,
   TileLayerConfig,
+  ValueLabels,
 }

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { useId } from 'vue'
 import { isRestricting, type Filter, type FilterState } from './filters'
+import type { ValueLabels } from './table'
 
 const props = defineProps<{
   filters: Filter[]
   /** Selected options per filter id. */
   modelValue: FilterState
+  /** Text shown for the options; the state keeps the data's values. */
+  valueLabels?: ValueLabels
 }>()
 const emit = defineEmits<{ 'update:modelValue': [state: FilterState] }>()
 
@@ -59,7 +62,7 @@ function toggle(filter: Filter, option: string, checked: boolean) {
               @change="toggle(filter, option, ($event.target as HTMLInputElement).checked)"
             />
             <label class="form-check-label" :for="`${uid}-${filter.id}-${index}`">
-              {{ option }}
+              {{ valueLabels?.[filter.property]?.[option] ?? option }}
             </label>
           </div>
         </fieldset>

@@ -83,7 +83,7 @@ for (const path of ['/demo/bare.html', '/demo/index.html']) {
     expect(popoverBox.y).toBeGreaterThanOrEqual(buttonBox.y + buttonBox.height - 1)
     expect(popoverBox.y).toBeLessThan(buttonBox.y + buttonBox.height + 12)
 
-    await popover.getByLabel('birdscan').uncheck()
+    await popover.getByLabel('BirdScan radar').uncheck()
     await page.keyboard.press('Escape')
     await page.getByRole('button', { name: 'Table', exact: true }).click()
     // 19 deployments in the test data, 3 of them BirdScan.
@@ -223,7 +223,7 @@ test('clicking a marker opens its panel, Escape closes it', async ({ page }) => 
   const marker = await findMarker(page)
   await page.mouse.click(marker.x, marker.y)
 
-  const panel = page.getByRole('complementary', { name: 'Details' })
+  const panel = page.getByRole('complementary')
   await expect(panel.getByRole('rowheader', { name: 'Deployment id' })).toBeVisible()
   expect(logged.some((line) => line.startsWith('select'))).toBe(true)
 
@@ -243,7 +243,7 @@ test('a table row opens its panel from the keyboard and gets focus back', async 
   await rowButton.focus()
   await page.keyboard.press('Enter')
 
-  const panel = page.getByRole('complementary', { name: 'Details' })
+  const panel = page.getByRole('complementary', { name: 'Den Helder' })
   await expect(panel.getByRole('cell', { name: 'nldhl-1' })).toBeVisible()
   await expect(page.locator('tr.table-active')).toContainText('nldhl')
   await expect(panel.getByRole('button', { name: 'Close' })).toBeFocused()
@@ -262,7 +262,66 @@ test('on a narrow widget the panel covers the map', async ({ page }) => {
   await openDemo(page, '/demo/index.html')
   const marker = await findMarker(page)
   await page.mouse.click(marker.x, marker.y)
-  const panel = await page.getByRole('complementary', { name: 'Details' }).boundingBox()
+  const panel = await page.getByRole('complementary').boundingBox()
   const body = await page.locator('.deploy-map__body').boundingBox()
   expect(panel).toEqual(body)
+})
+
+/**
+ * `panel.sections` and `valueLabels` are what lets a host (the radar registry)
+ * get its metadata blocks from configuration alone: the panel must show the
+ * configured title, section headings and labels, and the value label must
+ * replace the raw value in the panel, the legend and the table alike.
+ */
+test('the panel follows the configured sections and value labels', async ({ page }) => {
+  await openDemo(page, '/demo/index.html')
+  await expect(page.getByLabel('Legend')).toContainText('Weather radar')
+  await page.getByRole('button', { name: 'Table', exact: true }).click()
+  await page.getByRole('button', { name: 'nldhl', exact: true }).click()
+
+  const panel = page.getByRole('complementary', { name: 'Den Helder' })
+  await expect(panel.getByRole('heading', { name: 'Radar metadata' })).toBeVisible()
+  await expect(panel.getByRole('heading', { name: 'Deployment metadata' })).toBeVisible()
+  await expect(panel.getByRole('row', { name: 'Max range (km) 320' })).toBeVisible()
+  await expect(panel.getByRole('row', { name: 'Type Weather radar' })).toBeVisible()
+  await expect(page.locator('tr.table-active')).toContainText('Weather radar')
+})
+
+/**
+ * With no `panel` option the widget must still show something useful (every
+ * plain property), and `panel.content` must replace that list with the host's
+ * own element, rebuilt for each selected point.
+ */
+test('the panel lists all properties by default and accepts custom content', async ({ page }) => {
+  await openDemo(page, '/demo/index.html')
+  await page.evaluate(() => {
+    const mount = (window as unknown as { DeployMap: { mount: (el: Element, config: object) => void } })
+      .DeployMap.mount
+    for (const id of ['plain', 'custom']) {
+      document.body.insertAdjacentHTML('beforeend', `<div id="${id}" style="height: 400px"></div>`)
+    }
+    mount(document.querySelector('#plain')!, { data: 'registry.json' })
+    mount(document.querySelector('#custom')!, {
+      data: 'registry.json',
+      panel: {
+        content: (feature: { properties: { radar_id: string } }) => {
+          const p = document.createElement('p')
+          p.textContent = `Custom content for ${feature.properties.radar_id}`
+          return p
+        },
+      },
+    })
+  })
+  for (const id of ['plain', 'custom']) {
+    await page.locator(`#${id}`).getByRole('button', { name: 'Table', exact: true }).click()
+  }
+  await page.locator('#plain').getByRole('button', { name: 'nldhl-1', exact: true }).click()
+  const plain = page.locator('#plain').getByRole('complementary', { name: 'Details' })
+  await expect(plain.getByRole('row', { name: 'Antenna height 55' })).toBeVisible()
+
+  const custom = page.locator('#custom')
+  await custom.getByRole('button', { name: 'nldhl-1', exact: true }).click()
+  await expect(custom.getByRole('complementary')).toContainText('Custom content for nldhl')
+  await custom.getByRole('button', { name: 'behel-1', exact: true }).click()
+  await expect(custom.getByRole('complementary')).toContainText('Custom content for behel')
 })

@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import type { Feature, Point } from 'geojson'
-import { formatCell, type Column } from './table'
+import { formatCell, type Column, type ValueLabels } from './table'
 
-defineProps<{
+const props = defineProps<{
   features: Feature<Point>[]
   columns: Column[]
   selected?: Feature<Point>
+  valueLabels?: ValueLabels
 }>()
+
+function cell(feature: Feature<Point>, property: string) {
+  return formatCell(feature.properties?.[property], props.valueLabels?.[property])
+}
 
 defineEmits<{ select: [feature: Feature<Point>] }>()
 </script>
@@ -31,9 +36,9 @@ defineEmits<{ select: [feature: Feature<Point>] }>()
             <!-- A real button in the first cell: rows are reachable by keyboard,
                  which markers drawn on a canvas are not. Its click bubbles to the row. -->
             <button v-if="position === 0" type="button" class="deploy-map__row-button">
-              {{ formatCell(feature.properties?.[column.property]) || 'Details' }}
+              {{ cell(feature, column.property) || 'Details' }}
             </button>
-            <template v-else>{{ formatCell(feature.properties?.[column.property]) }}</template>
+            <template v-else>{{ cell(feature, column.property) }}</template>
           </td>
         </tr>
       </tbody>

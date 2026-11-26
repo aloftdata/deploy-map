@@ -62,4 +62,19 @@ describe('resolveStyle', () => {
     expect(style.legend.at(-1)).toEqual({ label: 'Unknown', color: UNKNOWN_COLOR })
     expect(resolveStyle([weather], { colorBy: 'type' }).legend).toHaveLength(1)
   })
+
+  /**
+   * Value labels change what the legend says, not which colour a value gets:
+   * a host can rename "weather" to "Weather radar" without the colours moving.
+   */
+  it('shows value labels in the legend without changing the colours', () => {
+    const points = [
+      { type: 'Feature' as const, geometry: { type: 'Point' as const, coordinates: [0, 0] }, properties: { type: 'weather' } },
+      { type: 'Feature' as const, geometry: { type: 'Point' as const, coordinates: [0, 0] }, properties: { type: 'birdscan' } },
+    ]
+    const plain = resolveStyle(points, { colorBy: 'type' })
+    const labelled = resolveStyle(points, { colorBy: 'type' }, { type: { weather: 'Weather radar' } })
+    expect(labelled.legend.map((entry) => entry.label)).toEqual(['birdscan', 'Weather radar'])
+    expect(labelled.legend.map((entry) => entry.color)).toEqual(plain.legend.map((entry) => entry.color))
+  })
 })
