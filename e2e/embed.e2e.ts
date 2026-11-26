@@ -184,3 +184,85 @@ async function settleScroll(page: Page) {
     }, { intervals: [100] })
     .toBe(true)
 }
+
+/**
+ * Client coordinates of a marker. Markers are drawn on a canvas and tiles are
+ * blocked in these tests, so any opaque canvas pixel belongs to a marker's
+ * outline. Pixels covered by something else (zoom buttons, legend) are skipped.
+ */
+async function findMarker(page: Page): Promise<{ x: number; y: number }> {
+  const point = await page.locator('.deploy-map canvas').evaluate((canvas: HTMLCanvasElement) => {
+    const { data, width, height } = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height)
+    const box = canvas.getBoundingClientRect()
+    // The canvas takes no pointer events itself: Leaflet hit-tests on the map element.
+    const mapEl = canvas.closest('.leaflet-container')
+    for (let i = 3; i < data.length; i += 4) {
+      if (data[i] < 250) continue
+      const pixel = (i - 3) / 4
+      const x = box.left + ((pixel % width) + 0.5) * (box.width / width)
+      const y = box.top + (Math.floor(pixel / width) + 0.5) * (box.height / height)
+      // The scan meets a marker at the top edge of its 3px outline; aim at the
+      // middle of the outline, the edge itself is a rounding error from a miss.
+      if (document.elementFromPoint(x, y) === mapEl) return { x, y: y + 1.5 }
+    }
+    return null
+  })
+  if (!point) throw new Error('no marker found on the canvas')
+  return point
+}
+
+/**
+ * Clicking a marker is the main way into a point's details: it must open the
+ * panel with that point's properties and tell the host through `onSelect`.
+ * Escape closes it again. Guards the canvas click handling of the Leaflet beta.
+ */
+test('clicking a marker opens its panel, Escape closes it', async ({ page }) => {
+  const logged: string[] = []
+  page.on('console', (message) => logged.push(message.text()))
+  await openDemo(page, '/demo/index.html')
+  const marker = await findMarker(page)
+  await page.mouse.click(marker.x, marker.y)
+
+  const panel = page.getByRole('complementary', { name: 'Details' })
+  await expect(panel.getByRole('rowheader', { name: 'Deployment id' })).toBeVisible()
+  expect(logged.some((line) => line.startsWith('select'))).toBe(true)
+
+  await page.keyboard.press('Escape')
+  await expect(panel).toHaveCount(0)
+})
+
+/**
+ * The table is the keyboard-accessible alternative to the map: a row can be
+ * opened without a mouse, the panel shows that row's point, the row is marked,
+ * and closing the panel puts focus back on the row so the user keeps their place.
+ */
+test('a table row opens its panel from the keyboard and gets focus back', async ({ page }) => {
+  await openDemo(page, '/demo/index.html')
+  await page.getByRole('button', { name: 'Table', exact: true }).click()
+  const rowButton = page.getByRole('button', { name: 'nldhl', exact: true })
+  await rowButton.focus()
+  await page.keyboard.press('Enter')
+
+  const panel = page.getByRole('complementary', { name: 'Details' })
+  await expect(panel.getByRole('cell', { name: 'nldhl-1' })).toBeVisible()
+  await expect(page.locator('tr.table-active')).toContainText('nldhl')
+  await expect(panel.getByRole('button', { name: 'Close' })).toBeFocused()
+
+  await page.keyboard.press('Escape')
+  await expect(panel).toHaveCount(0)
+  await expect(rowButton).toBeFocused()
+})
+
+/**
+ * On a narrow widget (a phone, or a narrow column) there is no room for a
+ * panel beside the map, so it must cover the map area instead of squeezing it.
+ */
+test('on a narrow widget the panel covers the map', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 700 })
+  await openDemo(page, '/demo/index.html')
+  const marker = await findMarker(page)
+  await page.mouse.click(marker.x, marker.y)
+  const panel = await page.getByRole('complementary', { name: 'Details' }).boundingBox()
+  const body = await page.locator('.deploy-map__body').boundingBox()
+  expect(panel).toEqual(body)
+})

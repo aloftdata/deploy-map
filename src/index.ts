@@ -1,3 +1,4 @@
+import type { Feature, Point } from 'geojson'
 import { createApp, h, shallowReactive } from 'vue'
 import DeployMap from './DeployMap.vue'
 import type { BootstrapMode } from './bootstrap'
@@ -34,6 +35,8 @@ export interface DeployMapConfig {
   onFilterchange?: (state: FilterState) => void
   /** Called when the user switches between map and table. */
   onViewchange?: (view: 'map' | 'table') => void
+  /** Called when the user selects a point, and with null when its panel is closed. */
+  onSelect?: (feature: Feature<Point> | null) => void
 }
 
 /** Options that can be changed on a mounted widget. */

@@ -6,6 +6,7 @@ const widget = DeployMap.mount('#map', {
   style: { colorBy: 'type' },
   onFilterchange: (state) => console.log('filterchange', state),
   onViewchange: (view) => console.log('viewchange', view),
+  onSelect: (feature) => console.log('select', feature && feature.properties.deployment_id),
   table: {
     columns: [
       { property: 'radar_id', label: 'Code' },
