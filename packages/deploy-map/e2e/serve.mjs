@@ -1,4 +1,4 @@
-// Static file server for the browser tests: serves the repository root, so the
+// Static file server for the browser tests: serves the package folder, so the
 // demo pages find ../dist as they do on GitHub Pages.
 // (python3 -m http.server resets connections when several browsers load pages
 // in parallel, which made the tests fail at random.)

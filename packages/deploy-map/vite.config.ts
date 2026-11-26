@@ -10,7 +10,8 @@ function compileScopedBootstrap(): string {
   const { css } = sass.compile('src/styles/bootstrap-scoped.scss', {
     style: 'compressed',
     charset: false,
-    loadPaths: ['node_modules'],
+    // Bootstrap is installed at the workspace root.
+    loadPaths: ['../../node_modules'],
     // Bootstrap 5.3 is written in the older Sass syntax; these warnings are about its code.
     quietDeps: true,
     silenceDeprecations: ['import', 'global-builtin', 'color-functions', 'if-function'],

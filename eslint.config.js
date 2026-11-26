@@ -3,7 +3,7 @@ import vue from 'eslint-plugin-vue'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: ['**/dist'] },
   js.configs.recommended,
   tseslint.configs.recommended,
   // "essential" only: the larger presets are mostly template formatting rules.
@@ -16,12 +16,12 @@ export default tseslint.config(
     rules: { 'no-undef': 'off' },
   },
   {
-    files: ['e2e/**/*.mjs'],
+    files: ['**/e2e/**/*.mjs'],
     languageOptions: { globals: { process: 'readonly', URL: 'readonly' } },
   },
   {
     // Plain browser script loaded after the widget bundle.
-    files: ['demo/**/*.js'],
+    files: ['**/demo/**/*.js'],
     languageOptions: {
       sourceType: 'script',
       globals: { DeployMap: 'readonly', document: 'readonly', console: 'readonly' },
