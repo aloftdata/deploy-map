@@ -33,6 +33,17 @@ export interface DeployMapConfig {
    */
   panel?: PanelConfig
   /**
+   * Keep selection, filters and view in the page's URL fragment ("#point=..."),
+   * and restore them from it, so a link opens the widget in the same state.
+   * Default false: the fragment belongs to the host page.
+   */
+  permalink?: boolean
+  /**
+   * Property that identifies a point in links. Default: the GeoJSON `id`, else
+   * a property named `id`, else the point's position in the data.
+   */
+  idProperty?: string
+  /**
    * Where the Bootstrap styles come from. Default 'auto': the host page's
    * Bootstrap 5.3 when it has one, bundled styles scoped to the widget otherwise.
    */

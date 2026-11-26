@@ -23,6 +23,7 @@ import {
 } from './leaflet'
 import { resolveStyle, type StyleConfig } from './style'
 import type { PanelConfig } from './panel'
+import { decodeLink, encodeLink, featureId } from './permalink'
 import { resolveColumns, type ColumnConfig, type ValueLabels } from './table'
 
 const VIEWS = [
@@ -49,6 +50,13 @@ const props = withDefaults(
     valueLabels?: ValueLabels
     /** The panel of a selected point. Default: every property holding a plain value. */
     panel?: PanelConfig
+    /**
+     * Keep selection, filters and view in the page's URL fragment, and restore
+     * them from it. Off by default: the fragment belongs to the host page.
+     */
+    permalink?: boolean
+    /** Property identifying a point in links. Default: the GeoJSON id, else `id`, else the position. */
+    idProperty?: string
     /** Where the Bootstrap styles come from. Read once, when the widget mounts. */
     bootstrap?: BootstrapMode
     /** When the scroll wheel zooms the map. Read once, when the widget mounts. */
@@ -110,6 +118,31 @@ function onEscape(event: KeyboardEvent) {
   if (!(event.target as Element).closest(':popover-open')) select(undefined)
 }
 
+const ids = computed(() =>
+  features.value.map((feature, index) => featureId(feature, index, props.idProperty)),
+)
+
+/** Put the widget in the state the URL describes. The host's callbacks are not called. */
+function readLink() {
+  const link = decodeLink(location.hash, filters.value)
+  filterState.value = link.filters
+  view.value = link.view
+  const index = link.point === undefined ? -1 : ids.value.indexOf(link.point)
+  selected.value = features.value[index]
+  map?.select(selected.value, true)
+}
+
+function writeLink() {
+  const index = selected.value ? features.value.indexOf(selected.value) : -1
+  const fragment = encodeLink(
+    { point: ids.value[index], view: view.value, filters: filterState.value },
+    filters.value,
+  )
+  if (fragment === location.hash.slice(1)) return
+  // replaceState: no history entry per click, and no hashchange event to loop on.
+  history.replaceState(history.state, '', fragment ? `#${fragment}` : location.pathname + location.search)
+}
+
 function setView(next: View) {
   if (next === view.value) return
   view.value = next
@@ -130,6 +163,13 @@ onMounted(async () => {
       tileLayer: props.tileLayer,
       scrollZoom: props.scrollZoom,
     })
+    if (props.permalink) {
+      readLink()
+      // The user edited the address, or followed a link to this same page.
+      // ponytail: one fragment per page, so one widget with `permalink` per page.
+      window.addEventListener('hashchange', readLink)
+      watch([selected, view, filterState], writeLink)
+    }
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   }
@@ -137,7 +177,10 @@ onMounted(async () => {
 
 watch([filterState, () => props.matchBehaviour], updateMap)
 
-onBeforeUnmount(() => map?.destroy())
+onBeforeUnmount(() => {
+  window.removeEventListener('hashchange', readLink)
+  map?.destroy()
+})
 </script>
 
 <template>
