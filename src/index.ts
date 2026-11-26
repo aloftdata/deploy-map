@@ -1,11 +1,13 @@
+import type { Feature, Point } from 'geojson'
 import { createApp, h, shallowReactive } from 'vue'
 import DeployMap from './DeployMap.vue'
 import type { BootstrapMode } from './bootstrap'
 import type { PointCollection } from './data'
 import type { FilterConfig, FilterState } from './filters'
-import type { MatchBehaviour, TileLayerConfig } from './leaflet'
+import type { MatchBehaviour, ScrollZoom, TileLayerConfig } from './leaflet'
 import type { StyleConfig } from './style'
-import type { ColumnConfig } from './table'
+import type { PanelConfig } from './panel'
+import type { ColumnConfig, ValueLabels } from './table'
 
 export interface DeployMapConfig {
   /** URL of a GeoJSON FeatureCollection of points, or the collection itself. */
@@ -21,14 +23,31 @@ export interface DeployMapConfig {
   /** Marker colours. One colour for all points by default. */
   style?: StyleConfig
   /**
+   * Text to show instead of the data's values, per property:
+   * `{ type: { weather: 'Weather radar' } }`. Used by filters, legend, table and panel.
+   */
+  valueLabels?: ValueLabels
+  /**
+   * The panel of a selected point: its title, sections of properties, or
+   * custom content. Default: every property holding a plain value.
+   */
+  panel?: PanelConfig
+  /**
    * Where the Bootstrap styles come from. Default 'auto': the host page's
    * Bootstrap 5.3 when it has one, bundled styles scoped to the widget otherwise.
    */
   bootstrap?: BootstrapMode
+  /**
+   * When the scroll wheel zooms the map. Default 'afterClick': only once the
+   * map has been clicked, so scrolling a page past the map is not interrupted.
+   */
+  scrollZoom?: ScrollZoom
   /** Called when the user changes a filter, with the selected options per filter id. */
   onFilterchange?: (state: FilterState) => void
   /** Called when the user switches between map and table. */
   onViewchange?: (view: 'map' | 'table') => void
+  /** Called when the user selects a point, and with null when its panel is closed. */
+  onSelect?: (feature: Feature<Point> | null) => void
 }
 
 /** Options that can be changed on a mounted widget. */
@@ -64,7 +83,10 @@ export type {
   FilterConfig,
   FilterState,
   MatchBehaviour,
+  PanelConfig,
   PointCollection,
+  ScrollZoom,
   StyleConfig,
   TileLayerConfig,
+  ValueLabels,
 }

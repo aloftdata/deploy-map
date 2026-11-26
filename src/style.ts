@@ -34,7 +34,12 @@ export const DEFAULT_PALETTE = [
 export const UNKNOWN_COLOR = '#777777'
 export const UNKNOWN_LABEL = 'Unknown'
 
-export function resolveStyle(features: Feature<Point>[], config: StyleConfig = {}): Style {
+/** `labels`: text to show in the legend instead of the values, per property. */
+export function resolveStyle(
+  features: Feature<Point>[],
+  config: StyleConfig = {},
+  labels: Record<string, Record<string, string>> = {},
+): Style {
   const { colorBy, palette = {} } = config
   if (!colorBy) return { colorOf: () => DEFAULT_PALETTE[0], legend: [] }
 
@@ -57,7 +62,10 @@ export function resolveStyle(features: Feature<Point>[], config: StyleConfig = {
     colors.set(value, palette[value] ?? DEFAULT_PALETTE[next++ % DEFAULT_PALETTE.length])
   }
 
-  const legend = [...colors].map(([label, color]) => ({ label, color }))
+  const legend = [...colors].map(([value, color]) => ({
+    label: labels[colorBy]?.[value] ?? value,
+    color,
+  }))
   if (hasUnknown) legend.push({ label: UNKNOWN_LABEL, color: UNKNOWN_COLOR })
   return {
     colorOf: (feature) => colors.get(valueOf(feature) ?? '') ?? UNKNOWN_COLOR,

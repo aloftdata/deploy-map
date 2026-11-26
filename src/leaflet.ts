@@ -21,17 +21,32 @@ export const DEFAULT_TILE_LAYER: TileLayerConfig = {
   maxZoom: 16,
 }
 
+/**
+ * When the scroll wheel zooms the map:
+ * - 'afterClick': only once the map has been clicked, until the pointer leaves
+ *   it. Scrolling a page past the map then keeps scrolling the page.
+ * - 'always': whenever the pointer is over the map. For a map that fills the page.
+ * - 'never'
+ */
+export type ScrollZoom = 'afterClick' | 'always' | 'never'
+
 /** What happens to points that do not match the filters. */
 export type MatchBehaviour = 'hide' | 'dim'
 
 export interface MapHandle {
   /** Show the points that pass `isMatch` normally, and hide or dim the others. */
   update: (isMatch: (feature: Feature<Point>) => boolean, behaviour: MatchBehaviour) => void
+  /** Highlight the marker of `feature`, or none. */
+  select: (feature: Feature<Point> | undefined) => void
   destroy: () => void
 }
 
 const SOLID = { opacity: 1, fillOpacity: 0.2 } // Leaflet's own path defaults
 const DIMMED = { opacity: 0.4, fillOpacity: 0.05 }
+// The selected marker gets a heavier outline. Weight is kept apart from the
+// opacities above, so that selecting and filtering do not undo each other.
+const WEIGHT = 3 // Leaflet's own path default
+const SELECTED_WEIGHT = 7
 
 /** Draw the points on a new map in `el`, zoomed to fit them. */
 export function createMap(
@@ -39,12 +54,23 @@ export function createMap(
   points: PointCollection,
   options: {
     colorOf: (feature: Feature<Point>) => string
+    /** Called when a marker is clicked. */
+    onSelect: (feature: Feature<Point>) => void
     tileLayer?: TileLayerConfig
+    scrollZoom?: ScrollZoom
   },
 ): MapHandle {
-  const { colorOf, tileLayer = DEFAULT_TILE_LAYER } = options
+  const { colorOf, onSelect, tileLayer = DEFAULT_TILE_LAYER, scrollZoom = 'afterClick' } = options
   // One shared canvas for all markers: a thousand or more points are expected.
-  const map = new LeafletMap(el, { renderer: new Canvas() })
+  const map = new LeafletMap(el, {
+    renderer: new Canvas(),
+    scrollWheelZoom: scrollZoom === 'always',
+  })
+  if (scrollZoom === 'afterClick') {
+    // The listeners go away with the element when the map is destroyed.
+    el.addEventListener('pointerdown', () => map.scrollWheelZoom.enable())
+    el.addEventListener('pointerleave', () => map.scrollWheelZoom.disable())
+  }
   new TileLayer(tileLayer.url, {
     attribution: tileLayer.attribution,
     maxZoom: tileLayer.maxZoom,
@@ -54,6 +80,7 @@ export function createMap(
   const layer = new GeoJSON(points, {
     pointToLayer: (feature, latlng) => {
       const marker = new CircleMarker(latlng, { radius: 6, color: colorOf(feature) })
+      marker.on('click', () => onSelect(feature))
       markers.push([feature, marker])
       return marker
     },
@@ -74,6 +101,13 @@ export function createMap(
         if (visible && !layer.hasLayer(marker)) layer.addLayer(marker)
         if (!visible && layer.hasLayer(marker)) layer.removeLayer(marker)
         marker.setStyle(match ? SOLID : DIMMED)
+      }
+    },
+    select(feature) {
+      for (const [candidate, marker] of markers) {
+        const selected = candidate === feature
+        marker.setStyle({ weight: selected ? SELECTED_WEIGHT : WEIGHT })
+        if (selected) marker.bringToFront()
       }
     },
     destroy: () => map.remove(),

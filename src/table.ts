@@ -38,9 +38,20 @@ function plainProperties(features: Feature<Point>[]): string[] {
   return [...names]
 }
 
-/** Text for a table cell. Missing values are empty, not "null". */
-export function formatCell(value: unknown): string {
+/**
+ * Text to display instead of the values found in the data, per property:
+ * `{ type: { weather: 'Weather radar' } }`. Values not listed are shown as is.
+ * Only the display changes: filter state and events keep the data's values.
+ */
+export type ValueLabels = Record<string, Record<string, string>>
+
+/**
+ * Text for a table cell. Missing values are empty, not "null". `labels` are
+ * the value labels of the cell's property, if any.
+ */
+export function formatCell(value: unknown, labels: Record<string, string> = {}): string {
   if (value === null || value === undefined) return ''
-  if (Array.isArray(value)) return value.map(formatCell).join(', ')
-  return typeof value === 'object' ? JSON.stringify(value) : String(value)
+  if (Array.isArray(value)) return value.map((item) => formatCell(item, labels)).join(', ')
+  if (typeof value === 'object') return JSON.stringify(value)
+  return labels[String(value)] ?? String(value)
 }
