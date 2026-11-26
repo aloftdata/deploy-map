@@ -374,3 +374,20 @@ test('the address follows selection, view and filters, and restores them', async
   await page.getByLabel('BirdScan radar').check()
   await expect(page).toHaveURL(/index\.html$/)
 })
+
+/**
+ * The panel's headings must look the same whether Bootstrap comes from the
+ * host or from the widget. The bundled copy styles headings as
+ * `.deploy-map h2`, which once outweighed the panel's own sizes and gave a
+ * page-title-sized heading on hosts without Bootstrap.
+ */
+for (const path of ['/demo/index.html', '/demo/bare.html']) {
+  test(`${path}: the panel title keeps its own size`, async ({ page }) => {
+    await openDemo(page, path)
+    await page.getByRole('button', { name: 'Table', exact: true }).click()
+    await page.getByRole('button', { name: 'nldhl', exact: true }).click()
+    const panel = page.getByRole('complementary')
+    await expect(panel.getByRole('heading', { name: 'Den Helder' })).toHaveCSS('font-size', '16px')
+    await expect(panel.getByRole('heading', { name: 'Radar metadata' })).toHaveCSS('font-size', '14px')
+  })
+}

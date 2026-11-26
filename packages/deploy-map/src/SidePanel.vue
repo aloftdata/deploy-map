@@ -79,12 +79,13 @@ onBeforeUnmount(() => {
   align-items: center;
   padding-bottom: 0.5rem;
 }
-.deploy-map__panel-title {
+/* Two classes: the bundled Bootstrap styles headings as `.deploy-map h2`. */
+.deploy-map .deploy-map__panel-title {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
 }
-.deploy-map__section-title {
+.deploy-map .deploy-map__section-title {
   margin: 0.75rem 0 0.25rem;
   font-size: 0.875rem;
   font-weight: 600;

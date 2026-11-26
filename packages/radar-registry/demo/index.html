@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Radar registry demo</title>
+    <link rel="stylesheet" href="../dist/radar-registry.css">
+    <script src="../dist/radar-registry.js"></script>
+    <style>
+      body { margin: 1rem; font-family: system-ui, sans-serif; }
+    </style>
+  </head>
+  <body>
+    <h1>Radar registry demo</h1>
+    <p>
+      The registry widget with test data. Select a radar on the map or in the
+      table: the address of this page then links to it.
+    </p>
+    <div id="registry" style="height: 600px"></div>
+    <script>
+      // Everything else is preset; `data` will be the pipeline's output.
+      RadarRegistry.mount('#registry', { data: 'registry.json' })
+    </script>
+  </body>
+</html>

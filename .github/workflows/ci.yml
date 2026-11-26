@@ -16,9 +16,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
+      # Before the type check: radar-registry is checked against deploy-map's built types.
+      - run: npm run build
       - run: npm run typecheck
       - run: npm test
-      - run: npm run build
       - run: npx playwright install --with-deps
       - run: npm run test:e2e
       # The demo page loads ../dist, so the site keeps the package's layout.
@@ -28,6 +29,9 @@ jobs:
         run: |
           mkdir _site
           cp -r packages/deploy-map/demo packages/deploy-map/dist _site/
+          mkdir _site/radar-registry
+          # -L: the demo's registry.json is a link to deploy-map's test data.
+          cp -rL packages/radar-registry/demo packages/radar-registry/dist _site/radar-registry/
           echo '<!doctype html><meta http-equiv="refresh" content="0; url=demo/">' > _site/index.html
       - uses: actions/upload-pages-artifact@v5
         if: github.ref == 'refs/heads/main'

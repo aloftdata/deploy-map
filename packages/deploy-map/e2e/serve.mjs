@@ -6,7 +6,8 @@ import { createReadStream, existsSync, statSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join, normalize, resolve } from 'node:path'
 
-const ROOT = resolve(import.meta.dirname, '..')
+// Another folder to serve can be given as second argument (used by radar-registry).
+const ROOT = resolve(process.argv[3] ?? join(import.meta.dirname, '..'))
 const TYPES = {
   '.html': 'text/html',
   '.js': 'text/javascript',

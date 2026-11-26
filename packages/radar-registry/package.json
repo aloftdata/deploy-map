@@ -1,0 +1,47 @@
+{
+  "name": "@aloftdata/radar-registry",
+  "version": "0.1.0",
+  "description": "Map and table of the radars in the Aloft radar registry",
+  "keywords": [
+    "radar",
+    "aeroecology",
+    "map",
+    "widget"
+  ],
+  "homepage": "https://aloftdata.github.io/deploy-map/radar-registry/demo/",
+  "bugs": "https://github.com/aloftdata/deploy-map/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aloftdata/deploy-map.git",
+    "directory": "packages/radar-registry"
+  },
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/radar-registry.js",
+  "module": "./dist/radar-registry.esm.js",
+  "types": "./dist/types/index.d.ts",
+  "unpkg": "./dist/radar-registry.js",
+  "jsdelivr": "./dist/radar-registry.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/radar-registry.esm.js",
+      "default": "./dist/radar-registry.js"
+    },
+    "./dist/radar-registry.css": "./dist/radar-registry.css"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build && vite build --mode esm && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@aloftdata/deploy-map": "0.1.0"
+  }
+}
