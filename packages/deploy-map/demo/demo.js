@@ -3,7 +3,7 @@
 const widget = DeployMap.mount('#map', {
   data: 'registry.json',
   filters: [{ property: 'type', label: 'Radar type' }, 'country'],
-  style: { colorBy: 'type' },
+  style: { colourBy: 'type' },
   // The page's address follows selection, filters and view, and restores them.
   permalink: true,
   idProperty: 'deployment_id',
@@ -28,8 +28,8 @@ const widget = DeployMap.mount('#map', {
       { title: 'Deployment metadata', properties: ['deployment_id', 'start', 'end'] },
     ],
   },
-  onFilterchange: (state) => console.log('filterchange', state),
-  onViewchange: (view) => console.log('viewchange', view),
+  onFilterChange: (state) => console.log('filterChange', state),
+  onViewChange: (view) => console.log('viewChange', view),
   onSelect: (feature) => console.log('select', feature && feature.properties.deployment_id),
   table: {
     columns: [

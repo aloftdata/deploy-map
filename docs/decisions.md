@@ -19,3 +19,8 @@
 **What:** Points are selectable from the map and the table; the panel is configured as sections of properties (`panel.content` for anything else); permalinks live in the URL fragment and are off by default; the repo is an npm workspace and `@aloftdata/radar-registry` is deploy-map plus presets, with no map, table or panel code.
 **Why:** Keeping the registry to configuration means fixes land once, in deploy-map; an element-returning hook keeps data out of `innerHTML`; the fragment belongs to the host page, so the widget only takes it when asked.
 **Rejected:** HTML-string panel templates, query-string or pushState permalinks, map position in links, a registry widget that forks or subclasses the generic component. Reverses 2026-11-23 "single package": the second package now has code.
+
+## 2026-11-27 - Option names before 0.1: British spelling, camelCase callbacks
+**What:** `style.colourBy` (was `colorBy`), `onFilterChange` and `onViewChange` (were `onFilterchange`, `onViewchange`); `style` and `filters` now react to changes and `update()` accepts every reactive option; unknown option names are reported in the console.
+**Why:** One spelling across options and docs (`matchBehaviour`, "colours"), and renames are free only before the first release; the warning covers the habit of typing `colorBy`.
+**Rejected:** American spelling to match CSS and Leaflet, accepting both spellings as aliases, making `data` and `tileLayer` reactive (documented as read once instead).

@@ -3,7 +3,7 @@ import { own } from './table'
 
 export interface StyleConfig {
   /** Property whose value decides a point's colour. Without it, all points share one colour. */
-  colorBy?: string
+  colourBy?: string
   /** Colour per value. Values not listed get one from the default palette. */
   palette?: Record<string, string>
 }
@@ -31,7 +31,7 @@ export const DEFAULT_PALETTE = [
   '#F0E442',
   '#000000',
 ]
-/** For points that have no value for the `colorBy` property. */
+/** For points that have no value for the `colourBy` property. */
 export const UNKNOWN_COLOR = '#777777'
 export const UNKNOWN_LABEL = 'Unknown'
 
@@ -41,11 +41,11 @@ export function resolveStyle(
   config: StyleConfig = {},
   labels: Record<string, Record<string, string>> = {},
 ): Style {
-  const { colorBy, palette = {} } = config
-  if (!colorBy) return { colorOf: () => DEFAULT_PALETTE[0], legend: [] }
+  const { colourBy, palette = {} } = config
+  if (!colourBy) return { colorOf: () => DEFAULT_PALETTE[0], legend: [] }
 
   const valueOf = (feature: Feature<Point>) => {
-    const value = feature.properties?.[colorBy]
+    const value = feature.properties?.[colourBy]
     return value === null || value === undefined ? undefined : String(value)
   }
   const values = new Set<string>()
@@ -64,7 +64,7 @@ export function resolveStyle(
   }
 
   const legend = [...colors].map(([value, color]) => ({
-    label: own(own(labels, colorBy), value) ?? value,
+    label: own(own(labels, colourBy), value) ?? value,
     color,
   }))
   if (hasUnknown) legend.push({ label: UNKNOWN_LABEL, color: UNKNOWN_COLOR })

@@ -34,9 +34,9 @@ type View = (typeof VIEWS)[number]['id']
 
 const props = withDefaults(
   defineProps<{
-    /** URL of a GeoJSON FeatureCollection of points, or the collection itself. */
+    /** URL of a GeoJSON FeatureCollection of points, or the collection itself. Read once. */
     data: string | PointCollection
-    /** Defaults to the Esri Light Gray Canvas layer. */
+    /** Defaults to the Esri Light Gray Canvas layer. Read once. */
     tileLayer?: TileLayerConfig
     /** Table view settings. Columns default to every property holding a plain value. */
     table?: { columns?: ColumnConfig[] }
@@ -67,9 +67,9 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   /** The user changed a filter. Payload: selected options per filter id. */
-  filterchange: [state: FilterState]
+  filterChange: [state: FilterState]
   /** The user switched between map and table. */
-  viewchange: [view: View]
+  viewChange: [view: View]
   /** The user selected a point (its panel opened), or closed the panel: null. */
   select: [feature: Feature<Point> | null]
 }>()
@@ -105,7 +105,7 @@ function updateMap() {
 
 function onFilterChange(state: FilterState) {
   filterState.value = state
-  emit('filterchange', state)
+  emit('filterChange', state)
 }
 
 function select(feature: Feature<Point> | undefined, center = false) {
@@ -170,7 +170,7 @@ function writeLink() {
 function setView(next: View) {
   if (next === view.value) return
   view.value = next
-  emit('viewchange', next)
+  emit('viewChange', next)
 }
 
 onMounted(async () => {
@@ -200,6 +200,14 @@ onMounted(async () => {
 })
 
 watch([filterState, () => props.matchBehaviour], updateMap)
+watch(style, (next) => map?.recolour(next.colorOf))
+// A new list of filters starts with everything selected. Watching the option,
+// not the resolved filters: those also change when the data arrives, and a
+// reset then would undo the state restored from a link.
+watch(
+  () => props.filters,
+  () => (filterState.value = initialState(filters.value)),
+)
 // Registered here, not after the data has loaded: a watcher created after an
 // `await` is not tied to the component and would outlive it.
 watch([selected, view, filterState], () => {

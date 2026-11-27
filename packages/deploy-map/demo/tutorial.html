@@ -155,13 +155,13 @@
 
       <h2 id="colours">Colours and legend</h2>
       <p>
-        <code>style.colorBy</code> names the property that decides the colour of
+        <code>style.colourBy</code> names the property that decides the colour of
         a marker. Each value gets a colour from a built-in palette that stays
         readable for colour-blind people, and a legend appears on the map.
       </p>
 <pre class="runnable"><code>DeployMap.mount('#colour-map', {
   data: 'registry.json',
-  style: { colorBy: 'type' },
+  style: { colourBy: 'type' },
 })</code></pre>
       <div id="colour-map" class="result"></div>
       <p>
@@ -171,7 +171,7 @@
 <pre class="runnable"><code>DeployMap.mount('#palette-map', {
   data: 'registry.json',
   style: {
-    colorBy: 'type',
+    colourBy: 'type',
     palette: { weather: '#7b3294', birdscan: '#008837' },
   },
 })</code></pre>
@@ -225,7 +225,7 @@
 <pre class="runnable"><code>DeployMap.mount('#labels-map', {
   data: 'registry.json',
   filters: ['type'],
-  style: { colorBy: 'type' },
+  style: { colourBy: 'type' },
   valueLabels: {
     type: { weather: 'Weather radar', birdscan: 'BirdScan radar' },
   },
@@ -281,12 +281,13 @@
 
       <h2 id="events">Reacting to the user</h2>
       <p>
-        <code>onFilterchange</code> and <code>onViewchange</code> are called
+        <code>onFilterChange</code> and <code>onViewChange</code> are called
         when someone changes a filter or switches between map and table, and
         <code>onSelect</code> when they select a point or close its panel.
         <code>mount()</code> also returns a handle: its <code>update()</code>
-        changes <code>matchBehaviour</code> or <code>table</code> on the running
-        widget, without losing the filters or the map position.
+        changes options such as <code>matchBehaviour</code>, <code>style</code>
+        or <code>filters</code> on the running widget, without losing the
+        selection or the map position.
       </p>
       <p>
         Change a filter or the view below, or select a point, and watch the
@@ -298,11 +299,11 @@
 const widget = DeployMap.mount('#events-map', {
   data: 'registry.json',
   filters: ['country'],
-  onFilterchange: (state) => {
-    log.textContent = 'filterchange: ' + JSON.stringify(state)
+  onFilterChange: (state) => {
+    log.textContent = 'filterChange: ' + JSON.stringify(state)
   },
-  onViewchange: (view) => {
-    log.textContent = 'viewchange: ' + view
+  onViewChange: (view) => {
+    log.textContent = 'viewChange: ' + view
   },
   onSelect: (feature) => {
     log.textContent = 'select: ' + (feature ? feature.properties.radar_id : 'nothing')
@@ -395,7 +396,7 @@ document.querySelector('#events-dim').addEventListener('click', () => {
   },
   filters: [{ property: 'type', label: 'Radar type' }, 'country'],
   matchBehaviour: 'dim',
-  style: { colorBy: 'type' },
+  style: { colourBy: 'type' },
   valueLabels: {
     type: { weather: 'Weather radar', birdscan: 'BirdScan radar' },
   },

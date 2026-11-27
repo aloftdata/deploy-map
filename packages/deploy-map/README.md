@@ -43,9 +43,14 @@ import '@aloftdata/deploy-map/dist/deploy-map.css'
 mount('#map', { data: 'points.geojson' })
 ```
 
-`mount()` returns a handle. `handle.update({ matchBehaviour, table })` changes
-those options on the mounted widget, keeping the filters, the view and the map
-position; `handle.unmount()` removes it.
+`mount()` returns a handle. `handle.update({ ... })` changes `matchBehaviour`,
+`table`, `filters`, `style`, `valueLabels` or `panel` on the mounted widget,
+keeping the selection, the view and the map position (a new `filters` list
+starts with everything selected). The other options are read once, when the
+widget mounts. `handle.unmount()` removes it.
+
+An option name the widget does not know, such as `colorBy` for `colourBy`, is
+reported with a warning in the browser console.
 
 The `DeployMap` Vue component is exported too and takes the same options as
 props. Its `panel` slot (slot prop: `feature`) replaces the panel's content.
@@ -63,7 +68,7 @@ something in the widget.
 | `tileLayer` | `{ url, attribution, maxZoom }`. Defaults to the Esri Light Gray Canvas layer. |
 | `table.columns` | Columns of the table view: property names, or `{ property, label }` to set the header. Defaults to every property holding a plain value, labelled after its name. |
 | `filters` | Filters to offer: property names, or `{ property, label, id }`. Each lists the distinct values of its property as checkboxes. Options of one filter combine with OR, filters with AND. Default: none. |
-| `style` | `{ colorBy, palette }`. `colorBy` names the property that decides a marker's colour; `palette` maps values to colours, and values it does not list get one from a built-in colour-blind-safe palette. A legend is shown when `colorBy` is set. Default: one colour for all points, no legend. |
+| `style` | `{ colourBy, palette }`. `colourBy` names the property that decides a marker's colour; `palette` maps values to colours, and values it does not list get one from a built-in colour-blind-safe palette. A legend is shown when `colourBy` is set. Default: one colour for all points, no legend. |
 | `matchBehaviour` | `'hide'` (default) or `'dim'`: what the map does with points that do not match. The table always lists matching points only. |
 | `bootstrap` | Where the Bootstrap styles come from: `'auto'` (default), `'host'` or `'bundled'`. See [Styling](#styling). |
 | `scrollZoom` | When the scroll wheel zooms the map: `'afterClick'` (default) only once the map has been clicked and until the pointer leaves it, so scrolling a page past the map is not interrupted; `'always'`; or `'never'`. |
@@ -72,8 +77,8 @@ something in the widget.
 | `permalink` | `true` keeps the selected point, the view and narrowed filters in the page's URL fragment (`#point=...&view=table&f.type=...`) and restores them from it, so a link opens the widget in the same state. Use it for one widget per page. Default `false`: the fragment belongs to your page. |
 | `idProperty` | Property that identifies a point in links. Default: the GeoJSON `id`, else a property named `id`, else the point's position in the data, which breaks links when the data is reordered. A point without the named property cannot be linked to. |
 | `onSelect` | Called with the GeoJSON feature when the user selects a point, and with `null` when the panel is closed. |
-| `onFilterchange` | Called with the selected options per filter id when the user changes a filter. |
-| `onViewchange` | Called with `'map'` or `'table'` when the user switches view. |
+| `onFilterChange` | Called with the selected options per filter id when the user changes a filter. |
+| `onViewChange` | Called with `'map'` or `'table'` when the user switches view. |
 
 Only `data` is required; everything else has a default.
 

@@ -54,18 +54,49 @@ export interface DeployMapConfig {
    */
   scrollZoom?: ScrollZoom
   /** Called when the user changes a filter, with the selected options per filter id. */
-  onFilterchange?: (state: FilterState) => void
+  onFilterChange?: (state: FilterState) => void
   /** Called when the user switches between map and table. */
-  onViewchange?: (view: 'map' | 'table') => void
+  onViewChange?: (view: 'map' | 'table') => void
   /** Called when the user selects a point, and with null when its panel is closed. */
   onSelect?: (feature: Feature<Point> | null) => void
 }
 
-/** Options that can be changed on a mounted widget. */
-export type UpdatableConfig = Pick<DeployMapConfig, 'matchBehaviour' | 'table'>
+/**
+ * Options that can be changed on a mounted widget. The others are read once,
+ * when the widget mounts: `data`, `tileLayer`, `bootstrap`, `scrollZoom`,
+ * `permalink`, `idProperty` and the callbacks.
+ */
+export type UpdatableConfig = Pick<
+  DeployMapConfig,
+  'matchBehaviour' | 'table' | 'filters' | 'style' | 'valueLabels' | 'panel'
+>
+
+// Every option name, to catch typos: a misspelt option is otherwise silently
+// ignored ("colorBy" gives one colour for all points and no hint why).
+const OPTIONS = [
+  'data', 'tileLayer', 'table', 'filters', 'matchBehaviour', 'style', 'valueLabels', 'panel',
+  'permalink', 'idProperty', 'bootstrap', 'scrollZoom', 'onFilterChange', 'onViewChange', 'onSelect',
+] satisfies (keyof DeployMapConfig)[]
+const STYLE_OPTIONS = ['colourBy', 'palette'] satisfies (keyof StyleConfig)[]
+
+function warnUnknown(options: object | undefined, known: string[], where: string) {
+  for (const name of Object.keys(options ?? {})) {
+    if (!known.includes(name)) {
+      console.warn(`deploy-map: unknown ${where} "${name}". Known: ${known.join(', ')}.`)
+    }
+  }
+}
+
+function checkOptions(options: Partial<DeployMapConfig>) {
+  warnUnknown(options, OPTIONS, 'option')
+  warnUnknown(options.style, STYLE_OPTIONS, 'style option')
+}
 
 export interface DeployMapHandle {
-  /** Change options without remounting: filters, view and map position are kept. */
+  /**
+   * Change options without remounting: selection, view and map position are
+   * kept. A new `filters` list starts with everything selected.
+   */
   update: (options: UpdatableConfig) => void
   unmount: () => void
 }
@@ -74,6 +105,7 @@ let mountCount = 0
 
 /** Mount the widget in `target` (a CSS selector or an element). */
 export function mount(target: string | Element, config: DeployMapConfig): DeployMapHandle {
+  checkOptions(config)
   // Shallow: only the top-level options are tracked, the data itself is left alone.
   const props = shallowReactive({ ...config })
   const app = createApp({ render: () => h(DeployMap, props) })
@@ -82,7 +114,10 @@ export function mount(target: string | Element, config: DeployMapConfig): Deploy
   app.config.idPrefix = `deploy-map-${++mountCount}`
   app.mount(target)
   return {
-    update: (options) => void Object.assign(props, options),
+    update: (options) => {
+      checkOptions(options)
+      Object.assign(props, options)
+    },
     unmount: () => app.unmount(),
   }
 }

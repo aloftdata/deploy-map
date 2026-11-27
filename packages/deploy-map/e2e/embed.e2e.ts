@@ -453,3 +453,60 @@ test('table rows keep their identity through filtering and expose the selected o
   await expect(page.getByRole('button', { name: 'behel', exact: true })).toHaveCount(0)
   expect(await row!.evaluate((el) => el.isConnected && el.textContent!.includes('nldhl'))).toBe(true)
 })
+
+/** Whether some marker on the canvas is drawn in the colour `rgb` ("r,g,b"). */
+function hasMarkerColour(page: Page, rgb: string): Promise<boolean> {
+  return page.locator('.deploy-map canvas').evaluate((canvas: HTMLCanvasElement, wanted) => {
+    const { data } = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height)
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] === 255 && `${data[i]},${data[i + 1]},${data[i + 2]}` === wanted) return true
+    }
+    return false
+  }, rgb)
+}
+
+/**
+ * `update()` must change the running widget, not only part of it. Changing
+ * `style` used to update the legend while the markers kept their old colours,
+ * and a new `filters` list kept the selection of the old one.
+ */
+test('update() recolours the markers and replaces the filters', async ({ page }) => {
+  await openDemo(page, '/demo/index.html')
+  await findMarker(page) // the markers are painted
+  // Third colour of the default palette: unused with two radar types,
+  // used once the markers are coloured by country (four countries).
+  const GREEN = '0,158,115'
+  expect(await hasMarkerColour(page, GREEN)).toBe(false)
+  await page.getByRole('button', { name: 'Radar type' }).click()
+  await page.getByLabel('BirdScan radar').uncheck()
+  await page.keyboard.press('Escape')
+
+  // `widget` is the handle the demo page keeps.
+  await page.evaluate("widget.update({ style: { colourBy: 'country' }, filters: ['location'] })")
+  await expect(page.getByLabel('Legend')).toContainText('Belgium')
+  await expect.poll(() => hasMarkerColour(page, GREEN)).toBe(true)
+  await expect(page.getByRole('button', { name: 'Radar type' })).toHaveCount(0)
+  // The old filter no longer hides anything, and the new one starts unrestricted.
+  await expect(page.getByRole('button', { name: 'Location' })).not.toContainText('/')
+  await page.getByRole('button', { name: 'Table', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'bs290', exact: true })).toBeVisible()
+})
+
+/**
+ * A misspelt option is silently ignored by JavaScript, and "colorBy" for
+ * "colourBy" is the spelling most people will type first. The widget must say
+ * so in the console, for options at mount and in update(), instead of showing
+ * one colour for all points with no hint why.
+ */
+test('an unknown option name is reported in the console', async ({ page }) => {
+  const warnings: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'warning') warnings.push(message.text())
+  })
+  await openDemo(page, '/demo/index.html')
+  expect(warnings.filter((text) => text.includes('unknown'))).toEqual([])
+
+  await page.evaluate("widget.update({ style: { colorBy: 'country' }, onFilterchange: () => {} })")
+  await expect.poll(() => warnings.join('\n')).toContain('unknown style option "colorBy"')
+  expect(warnings.join('\n')).toContain('unknown option "onFilterchange"')
+})

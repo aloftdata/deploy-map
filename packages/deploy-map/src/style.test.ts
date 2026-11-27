@@ -16,19 +16,19 @@ describe('resolveStyle', () => {
    * With no `style` config the widget must still draw: every point gets the
    * same colour, and there is no legend because there is nothing to explain.
    */
-  it('uses one colour and no legend when colorBy is not set', () => {
+  it('uses one colour and no legend when colourBy is not set', () => {
     const style = resolveStyle([weather, birdscan])
     expect(style.colorOf(weather)).toBe(style.colorOf(birdscan))
     expect(style.legend).toEqual([])
   })
 
   /**
-   * `colorBy` alone is enough: values get palette colours in sorted order, not
+   * `colourBy` alone is enough: values get palette colours in sorted order, not
    * in data order, so a value keeps its colour when the data is reordered or
    * refreshed. The legend lists exactly those pairs.
    */
   it('assigns default palette colours by sorted value', () => {
-    const style = resolveStyle([weather, birdscan, weather], { colorBy: 'type' })
+    const style = resolveStyle([weather, birdscan, weather], { colourBy: 'type' })
     expect(style.colorOf(birdscan)).toBe(DEFAULT_PALETTE[0])
     expect(style.colorOf(weather)).toBe(DEFAULT_PALETTE[1])
     expect(style.legend).toEqual([
@@ -44,7 +44,7 @@ describe('resolveStyle', () => {
    */
   it('lets a partial palette override single values', () => {
     const style = resolveStyle([weather, birdscan], {
-      colorBy: 'type',
+      colourBy: 'type',
       palette: { birdscan: '#44aa88' },
     })
     expect(style.colorOf(birdscan)).toBe('#44aa88')
@@ -57,10 +57,10 @@ describe('resolveStyle', () => {
    * a real category. The entry only appears when such points exist.
    */
   it('colours points without a value grey and says so in the legend', () => {
-    const style = resolveStyle([weather, untyped], { colorBy: 'type' })
+    const style = resolveStyle([weather, untyped], { colourBy: 'type' })
     expect(style.colorOf(untyped)).toBe(UNKNOWN_COLOR)
     expect(style.legend.at(-1)).toEqual({ label: 'Unknown', color: UNKNOWN_COLOR })
-    expect(resolveStyle([weather], { colorBy: 'type' }).legend).toHaveLength(1)
+    expect(resolveStyle([weather], { colourBy: 'type' }).legend).toHaveLength(1)
   })
 
   /**
@@ -72,8 +72,8 @@ describe('resolveStyle', () => {
       { type: 'Feature' as const, geometry: { type: 'Point' as const, coordinates: [0, 0] }, properties: { type: 'weather' } },
       { type: 'Feature' as const, geometry: { type: 'Point' as const, coordinates: [0, 0] }, properties: { type: 'birdscan' } },
     ]
-    const plain = resolveStyle(points, { colorBy: 'type' })
-    const labelled = resolveStyle(points, { colorBy: 'type' }, { type: { weather: 'Weather radar' } })
+    const plain = resolveStyle(points, { colourBy: 'type' })
+    const labelled = resolveStyle(points, { colourBy: 'type' }, { type: { weather: 'Weather radar' } })
     expect(labelled.legend.map((entry) => entry.label)).toEqual(['birdscan', 'Weather radar'])
     expect(labelled.legend.map((entry) => entry.color)).toEqual(plain.legend.map((entry) => entry.color))
   })
@@ -86,7 +86,7 @@ describe('resolveStyle', () => {
     const points = [
       { type: 'Feature' as const, geometry: { type: 'Point' as const, coordinates: [0, 0] }, properties: { type: 'constructor' } },
     ]
-    const { legend } = resolveStyle(points, { colorBy: 'type' })
+    const { legend } = resolveStyle(points, { colourBy: 'type' })
     expect(legend).toEqual([{ label: 'constructor', color: DEFAULT_PALETTE[0] }])
   })
 })
