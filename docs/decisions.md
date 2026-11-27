@@ -14,3 +14,8 @@
 **What:** The built-in tile layer is Esri Light Gray Canvas (maximum zoom 16) instead of the OpenStreetMap standard layer.
 **Why:** A muted background lets the markers stand out and is close to the mockups. Esri's terms for keyless use still have to be checked before publishing.
 **Rejected:** CARTO Positron (same look, labels included, terms equally unchecked), keeping OpenStreetMap as the default.
+
+## 2026-11-27 - Slice 4: selection, panel, permalinks, and the registry as a preset package
+**What:** Points are selectable from the map and the table; the panel is configured as sections of properties (`panel.content` for anything else); permalinks live in the URL fragment and are off by default; the repo is an npm workspace and `@aloftdata/radar-registry` is deploy-map plus presets, with no map, table or panel code.
+**Why:** Keeping the registry to configuration means fixes land once, in deploy-map; an element-returning hook keeps data out of `innerHTML`; the fragment belongs to the host page, so the widget only takes it when asked.
+**Rejected:** HTML-string panel templates, query-string or pushState permalinks, map position in links, a registry widget that forks or subclasses the generic component. Reverses 2026-11-23 "single package": the second package now has code.

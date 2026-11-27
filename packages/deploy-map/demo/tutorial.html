@@ -19,7 +19,7 @@
       <h1>deploy-map quick start</h1>
       <p class="lead">
         deploy-map shows a set of points on a map and in a table, with filters,
-        colours and a legend. This page starts with the smallest possible
+        colours, a legend and a details panel. This page starts with the smallest possible
         example and adds one thing at a time.
       </p>
       <p>
@@ -177,16 +177,120 @@
 })</code></pre>
       <div id="palette-map" class="result"></div>
 
+      <h2 id="select">Selecting a point</h2>
+      <p>
+        Click a marker on any map above, or a row in its table: a panel opens
+        with everything known about that point. That works without any option.
+        The panel closes with its button or the Escape key. In the table, the
+        first cell of each row is a button, so points can be opened from the
+        keyboard too.
+      </p>
+      <p>
+        To choose what the panel shows, give it a title and sections.
+        <code>titleProperty</code> names the property used as the title, and
+        each section lists properties the same way as table columns: a name,
+        or a name with a label.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#panel-map', {
+  data: 'registry.json',
+  panel: {
+    titleProperty: 'location',
+    sections: [
+      {
+        title: 'Radar',
+        properties: [
+          { property: 'radar_id', label: 'Code' },
+          'type',
+          { property: 'max_range', label: 'Max range (km)' },
+        ],
+      },
+      { title: 'Deployment', properties: ['country', 'start', 'end'] },
+    ],
+  },
+})</code></pre>
+      <div id="panel-map" class="result"></div>
+      <p>
+        On a narrow screen, or in a narrow column, the panel covers the map
+        instead of sitting next to it.
+      </p>
+
+      <h2 id="labels">Friendlier values</h2>
+      <p>
+        Data files often hold short codes: this one says <code>weather</code>
+        and <code>birdscan</code>. <code>valueLabels</code> gives the text to
+        show instead, per property. It is used everywhere a value appears: the
+        filter, the legend, the table and the panel. Your data, and what the
+        callbacks receive, stay as they are.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#labels-map', {
+  data: 'registry.json',
+  filters: ['type'],
+  style: { colorBy: 'type' },
+  valueLabels: {
+    type: { weather: 'Weather radar', birdscan: 'BirdScan radar' },
+  },
+})</code></pre>
+      <div id="labels-map" class="result"></div>
+
+      <h2 id="custom-panel">Your own panel content</h2>
+      <p>
+        When a list of properties is not enough, <code>panel.content</code>
+        takes a function. It receives the selected point as a GeoJSON feature
+        and returns the element to show. Build it with
+        <code>textContent</code> rather than <code>innerHTML</code>, so that
+        text from the data can never be read as HTML.
+      </p>
+<pre class="runnable"><code>DeployMap.mount('#custom-map', {
+  data: 'registry.json',
+  panel: {
+    titleProperty: 'location',
+    content: (feature) => {
+      const p = document.createElement('p')
+      const count = feature.properties.datasets.length
+      p.textContent = feature.properties.radar_id + ' has ' + count + ' dataset(s).'
+      return p
+    },
+  },
+})</code></pre>
+      <div id="custom-map" class="result"></div>
+
+      <h2 id="links">Links to a point</h2>
+      <p>
+        With <code>permalink: true</code> the address of your page follows the
+        widget: the selected point, the table view and any narrowed filter are
+        written after the <code>#</code>, and restored when someone opens that
+        address. A link can then lead straight to one point with its panel
+        open. Try it on the <a href="index.html#point=nldhl-1">demo</a>.
+      </p>
+<pre><code>DeployMap.mount('#map', {
+  data: 'registry.json',
+  permalink: true,
+  idProperty: 'deployment_id',
+})</code></pre>
+      <p>
+        <code>idProperty</code> names the property that identifies a point in
+        the link. Without it the widget uses the GeoJSON <code>id</code>, then
+        a property called <code>id</code>, then the point's position in the
+        file, which breaks old links when the file is reordered.
+      </p>
+      <p>
+        This is off by default because the part after the <code>#</code>
+        belongs to your page, and there is only one per page: turn it on for
+        one widget only. That is also why this example is not live here.
+      </p>
+
       <h2 id="events">Reacting to the user</h2>
       <p>
         <code>onFilterchange</code> and <code>onViewchange</code> are called
-        when someone changes a filter or switches between map and table.
+        when someone changes a filter or switches between map and table, and
+        <code>onSelect</code> when they select a point or close its panel.
         <code>mount()</code> also returns a handle: its <code>update()</code>
         changes <code>matchBehaviour</code> or <code>table</code> on the running
         widget, without losing the filters or the map position.
       </p>
       <p>
-        Change a filter or the view below and watch the line under the buttons.
+        Change a filter or the view below, or select a point, and watch the
+        line under the buttons.
         Then untick a country and use the two buttons.
       </p>
 <pre class="runnable"><code>const log = document.querySelector('#events-log')
@@ -199,6 +303,9 @@ const widget = DeployMap.mount('#events-map', {
   },
   onViewchange: (view) => {
     log.textContent = 'viewchange: ' + view
+  },
+  onSelect: (feature) => {
+    log.textContent = 'select: ' + (feature ? feature.properties.radar_id : 'nothing')
   },
 })
 
@@ -289,6 +396,16 @@ document.querySelector('#events-dim').addEventListener('click', () => {
   filters: [{ property: 'type', label: 'Radar type' }, 'country'],
   matchBehaviour: 'dim',
   style: { colorBy: 'type' },
+  valueLabels: {
+    type: { weather: 'Weather radar', birdscan: 'BirdScan radar' },
+  },
+  panel: {
+    titleProperty: 'location',
+    sections: [
+      { title: 'Radar', properties: [{ property: 'radar_id', label: 'Code' }, 'type'] },
+      { title: 'Deployment', properties: ['country', 'start', 'end'] },
+    ],
+  },
 })</code></pre>
       <div id="full-map" class="result"></div>
     </main>

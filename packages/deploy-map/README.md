@@ -6,8 +6,12 @@ Give it a GeoJSON FeatureCollection of points and it draws them on a map. It is
 not tied to a domain: radars, camera traps, sensor networks and sampling sites
 all work the same way.
 
-> Version 0.1: a map with coloured markers and a legend, a table view and filters.
-> Not on npm yet. Selecting a point, and more filter types, come next.
+> A map with coloured markers and a legend, a table view, filters, a details
+> panel for the selected point, and links to a point. Not on npm yet. More
+> filter types come next.
+
+[`@aloftdata/radar-registry`](../radar-registry) is an example of a widget
+built on this one: it only adds presets.
 
 - Demo: <https://aloftdata.github.io/deploy-map/>
 - Quick start tutorial: <https://aloftdata.github.io/deploy-map/demo/tutorial.html>
@@ -44,7 +48,10 @@ those options on the mounted widget, keeping the filters, the view and the map
 position; `handle.unmount()` removes it.
 
 The `DeployMap` Vue component is exported too and takes the same options as
-props.
+props. Its `panel` slot (slot prop: `feature`) replaces the panel's content.
+
+The callbacks are for what the user does: restoring the state from a link
+(`permalink`) does not call them.
 
 ### Options
 
@@ -58,6 +65,11 @@ props.
 | `matchBehaviour` | `'hide'` (default) or `'dim'`: what the map does with points that do not match. The table always lists matching points only. |
 | `bootstrap` | Where the Bootstrap styles come from: `'auto'` (default), `'host'` or `'bundled'`. See [Styling](#styling). |
 | `scrollZoom` | When the scroll wheel zooms the map: `'afterClick'` (default) only once the map has been clicked and until the pointer leaves it, so scrolling a page past the map is not interrupted; `'always'`; or `'never'`. |
+| `valueLabels` | Text to show instead of the data's values, per property: `{ type: { weather: 'Weather radar' } }`. Used by the filters, legend, table and panel; filter state and callbacks keep the data's values. Default: values are shown as they are. |
+| `panel` | The panel of a selected point (click a marker or a table row). `titleProperty` names the property used as title; `sections` is a list of `{ title, properties }`, with properties written like table columns; `content` is a function `(feature) => Element` that replaces the sections with your own element. Default: the title "Details" and every property holding a plain value. |
+| `permalink` | `true` keeps the selected point, the view and narrowed filters in the page's URL fragment (`#point=...&view=table&f.type=...`) and restores them from it, so a link opens the widget in the same state. Use it for one widget per page. Default `false`: the fragment belongs to your page. |
+| `idProperty` | Property that identifies a point in links. Default: the GeoJSON `id`, else a property named `id`, else the point's position in the data, which breaks links when the data is reordered. |
+| `onSelect` | Called with the GeoJSON feature when the user selects a point, and with `null` when the panel is closed. |
 | `onFilterchange` | Called with the selected options per filter id when the user changes a filter. |
 | `onViewchange` | Called with `'map'` or `'table'` when the user switches view. |
 
