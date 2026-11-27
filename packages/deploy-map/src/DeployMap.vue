@@ -23,7 +23,7 @@ import {
 } from './leaflet'
 import { resolveStyle, type StyleConfig } from './style'
 import type { PanelConfig } from './panel'
-import { decodeLink, encodeLink, featureId } from './permalink'
+import { decodeLink, encodeLink, featureId, isLink } from './permalink'
 import { resolveColumns, type ColumnConfig, type ValueLabels } from './table'
 
 const VIEWS = [
@@ -84,6 +84,8 @@ const filterState = shallowRef<FilterState>({})
 const selected = shallowRef<Feature<Point>>()
 const error = ref('')
 let map: MapHandle | undefined
+// True once the widget has read the URL and may write to it.
+let linked = false
 
 const features = computed(() => points.value?.features ?? [])
 const columns = computed(() => resolveColumns(features.value, props.table?.columns))
@@ -106,10 +108,10 @@ function onFilterChange(state: FilterState) {
   emit('filterchange', state)
 }
 
-function select(feature: Feature<Point> | undefined) {
+function select(feature: Feature<Point> | undefined, center = false) {
   if (feature === selected.value) return
   selected.value = feature
-  map?.select(feature)
+  map?.select(feature, center)
   emit('select', feature ?? null)
 }
 
@@ -118,24 +120,46 @@ function onEscape(event: KeyboardEvent) {
   if (!(event.target as Element).closest(':popover-open')) select(undefined)
 }
 
-const ids = computed(() =>
-  features.value.map((feature, index) => featureId(feature, index, props.idProperty)),
-)
+// Position of each feature in the data: a stable key for its table row.
+const positions = computed(() => new Map(features.value.map((feature, index) => [feature, index])))
 
-/** Put the widget in the state the URL describes. The host's callbacks are not called. */
+/** Link id of each feature, and the feature each id leads to. */
+const links = computed(() => {
+  const idOf = new Map<Feature<Point>, string>()
+  const byId = new Map<string, Feature<Point>>()
+  let duplicates = 0
+  features.value.forEach((feature, index) => {
+    const id = featureId(feature, index, props.idProperty)
+    if (id === undefined) return
+    idOf.set(feature, id)
+    if (byId.has(id)) duplicates++
+    else byId.set(id, feature)
+  })
+  if (duplicates && props.permalink) {
+    console.warn(`deploy-map: ${duplicates} point(s) share a link id with an earlier point; links open the first one`)
+  }
+  return { idOf, byId }
+})
+
+/**
+ * Put the widget in the state the URL describes, telling the host about what
+ * changed like for a user action. A fragment that is not ours is left alone.
+ */
 function readLink() {
+  if (!isLink(location.hash, filters.value)) return
   const link = decodeLink(location.hash, filters.value)
-  filterState.value = link.filters
-  view.value = link.view
-  const index = link.point === undefined ? -1 : ids.value.indexOf(link.point)
-  selected.value = features.value[index]
-  map?.select(selected.value, true)
+  if (JSON.stringify(link.filters) !== JSON.stringify(filterState.value)) onFilterChange(link.filters)
+  setView(link.view)
+  select(link.point === undefined ? undefined : links.value.byId.get(link.point), true)
 }
 
 function writeLink() {
-  const index = selected.value ? features.value.indexOf(selected.value) : -1
   const fragment = encodeLink(
-    { point: ids.value[index], view: view.value, filters: filterState.value },
+    {
+      point: selected.value && links.value.idOf.get(selected.value),
+      view: view.value,
+      filters: filterState.value,
+    },
     filters.value,
   )
   if (fragment === location.hash.slice(1)) return
@@ -168,7 +192,7 @@ onMounted(async () => {
       // The user edited the address, or followed a link to this same page.
       // ponytail: one fragment per page, so one widget with `permalink` per page.
       window.addEventListener('hashchange', readLink)
-      watch([selected, view, filterState], writeLink)
+      linked = true
     }
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
@@ -176,6 +200,11 @@ onMounted(async () => {
 })
 
 watch([filterState, () => props.matchBehaviour], updateMap)
+// Registered here, not after the data has loaded: a watcher created after an
+// `await` is not tied to the component and would outlive it.
+watch([selected, view, filterState], () => {
+  if (linked) writeLink()
+})
 
 onBeforeUnmount(() => {
   window.removeEventListener('hashchange', readLink)
@@ -222,6 +251,7 @@ onBeforeUnmount(() => {
           :features="matching"
           :columns="columns"
           :selected="selected"
+          :row-key="(feature) => positions.get(feature) ?? -1"
           :value-labels="valueLabels"
           @select="select"
         />

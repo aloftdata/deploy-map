@@ -234,7 +234,7 @@ test('clicking a marker opens its panel, Escape closes it', async ({ page }) => 
 
   const panel = page.getByRole('complementary')
   await expect(panel.getByRole('rowheader', { name: 'Deployment id' })).toBeVisible()
-  expect(logged.some((line) => line.startsWith('select'))).toBe(true)
+  await expect.poll(() => logged.some((line) => line.startsWith('select'))).toBe(true)
 
   await page.keyboard.press('Escape')
   await expect(panel).toHaveCount(0)
@@ -391,3 +391,65 @@ for (const path of ['/demo/index.html', '/demo/bare.html']) {
     await expect(panel.getByRole('heading', { name: 'Radar metadata' })).toHaveCSS('font-size', '14px')
   })
 }
+
+/**
+ * The part of the address after "#" belongs to the host page. Following one of
+ * the page's own anchor links used to be read as "no state": the panel closed,
+ * the filters were cleared and the anchor was wiped from the address. The
+ * widget must now ignore such a fragment and leave it in place.
+ */
+test('a host anchor link leaves the widget and the address alone', async ({ page }) => {
+  await openDemo(page, '/demo/index.html#point=nldhl-1')
+  const panel = page.getByRole('complementary', { name: 'Den Helder' })
+  await expect(panel).toBeVisible()
+
+  await page.evaluate(() => {
+    document.body.insertAdjacentHTML('beforeend', '<a id="to-contact" href="#contact">Contact</a><p id="contact">x</p>')
+  })
+  await page.locator('#to-contact').click()
+  await expect(page).toHaveURL(/#contact$/)
+  await expect(panel).toBeVisible()
+  // Give a wrong reaction to the hashchange event time to show.
+  await page.waitForTimeout(300)
+  await expect(page).toHaveURL(/#contact$/)
+  await expect(panel).toBeVisible()
+})
+
+/**
+ * A panel opened by a link, at page load or later, must not pull keyboard
+ * focus into the widget: the host page may have its own focused field. The
+ * host is told about the selection, so it does not go out of step.
+ */
+test('a link opens the panel without taking focus, and tells the host', async ({ page }) => {
+  const logged: string[] = []
+  page.on('console', (message) => logged.push(message.text()))
+  await openDemo(page, '/demo/index.html#point=nldhl-1')
+  await expect(page.getByRole('complementary', { name: 'Den Helder' })).toBeVisible()
+  await expect(page.locator('body')).toBeFocused()
+  await expect.poll(() => logged).toContain('select nldhl-1')
+
+  await page.evaluate(() => (location.hash = 'point=behel-1'))
+  await expect(page.getByRole('complementary', { name: 'Helchteren' })).toBeVisible()
+  await expect(page.locator('body')).toBeFocused()
+  await expect.poll(() => logged).toContain('select behel-1')
+})
+
+/**
+ * A table row must stay the same element for the same point when rows above
+ * it are filtered away. Rows used to be reused by position, so the element a
+ * keyboard user was on silently became another point. The selected row is
+ * also announced as current, not only tinted.
+ */
+test('table rows keep their identity through filtering and expose the selected one', async ({ page }) => {
+  await openDemo(page, '/demo/index.html')
+  await page.getByRole('button', { name: 'Table', exact: true }).click()
+  await page.getByRole('button', { name: 'nldhl', exact: true }).click()
+  const current = page.locator('tr[aria-current=true]')
+  await expect(current).toContainText('nldhl')
+  const row = await current.elementHandle()
+
+  await page.getByRole('button', { name: 'Country' }).click()
+  await page.getByLabel('Belgium').uncheck()
+  await expect(page.getByRole('button', { name: 'behel', exact: true })).toHaveCount(0)
+  expect(await row!.evaluate((el) => el.isConnected && el.textContent!.includes('nldhl'))).toBe(true)
+})

@@ -24,15 +24,19 @@ watchEffect(() => {
   }
 })
 
-// Keyboard users land in the panel when it opens, and go back to where they
-// were (a table row) when it closes.
-let opener: Element | null = null
+// Someone who opened the panel from a table row lands in the panel, and goes
+// back to that row when it closes. Otherwise focus stays where it is: a panel
+// opened by a link at page load, or by a click on the map, must not take it.
+let opener: HTMLElement | null = null
 onMounted(() => {
-  opener = document.activeElement
-  closeButton.value?.focus({ preventScroll: true })
+  const active = document.activeElement
+  if (active instanceof HTMLElement && active.matches('.deploy-map__row-button')) {
+    opener = active
+    closeButton.value?.focus({ preventScroll: true })
+  }
 })
 onBeforeUnmount(() => {
-  if (opener instanceof HTMLElement && opener.isConnected) opener.focus({ preventScroll: true })
+  if (opener?.isConnected) opener.focus({ preventScroll: true })
 })
 </script>
 

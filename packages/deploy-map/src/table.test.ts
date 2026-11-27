@@ -64,4 +64,15 @@ describe('formatCell', () => {
     expect(formatCell(['6234', '1207'])).toBe('6234, 1207')
     expect(formatCell({ level: 'public' })).toBe('{"level":"public"}')
   })
+
+  /**
+   * Values come from the data and are used as keys into the labels. A value
+   * that happens to be the name of a built-in object member ("constructor")
+   * used to be displayed as that member's source code.
+   */
+  it('does not mistake a value for a built-in object member', () => {
+    expect(formatCell('constructor', {})).toBe('constructor')
+    expect(formatCell('constructor')).toBe('constructor')
+    expect(formatCell('weather', { weather: 'Weather radar' })).toBe('Weather radar')
+  })
 })

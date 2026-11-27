@@ -46,6 +46,14 @@ function plainProperties(features: Feature<Point>[]): string[] {
 export type ValueLabels = Record<string, Record<string, string>>
 
 /**
+ * `record[key]`, but only for keys the record really has. Keys here come from
+ * the data: a value such as "constructor" must not find `Object.prototype`'s.
+ */
+export function own<T>(record: Record<string, T> | undefined, key: string): T | undefined {
+  return record && Object.hasOwn(record, key) ? record[key] : undefined
+}
+
+/**
  * Text for a table cell. Missing values are empty, not "null". `labels` are
  * the value labels of the cell's property, if any.
  */
@@ -53,5 +61,5 @@ export function formatCell(value: unknown, labels: Record<string, string> = {}):
   if (value === null || value === undefined) return ''
   if (Array.isArray(value)) return value.map((item) => formatCell(item, labels)).join(', ')
   if (typeof value === 'object') return JSON.stringify(value)
-  return labels[String(value)] ?? String(value)
+  return own(labels, String(value)) ?? String(value)
 }

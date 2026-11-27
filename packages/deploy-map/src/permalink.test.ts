@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Feature, Point } from 'geojson'
 import type { Filter } from './filters'
-import { decodeLink, encodeLink, featureId } from './permalink'
+import { decodeLink, encodeLink, featureId, isLink } from './permalink'
 
 const FILTERS: Filter[] = [
   { id: 'type', label: 'Type', property: 'type', options: ['birdscan', 'weather'] },
@@ -33,6 +33,33 @@ describe('featureId', () => {
    */
   it('accepts 0 as an id', () => {
     expect(featureId(feature({}, 0), 7)).toBe('0')
+  })
+
+  /**
+   * With an explicit id property, a point that lacks it must get no id at all.
+   * Falling back to its position ("3") could collide with another point whose
+   * real id is 3, and a link would then open the wrong point.
+   */
+  it('gives no id to a point without the configured property', () => {
+    expect(featureId(feature({ id: 'p' }, 'g'), 3, 'code')).toBeUndefined()
+    expect(featureId(feature({ code: null }), 3, 'code')).toBeUndefined()
+  })
+})
+
+describe('isLink', () => {
+  /**
+   * The fragment belongs to the host page. Its own anchors ("#contact") and an
+   * empty fragment say nothing about the widget: treating them as "default
+   * state" made any anchor link on the page close the panel and clear the
+   * filters. Only fragments carrying one of the widget's keys count.
+   */
+  it('recognises only fragments that carry the widget keys', () => {
+    expect(isLink('#contact', FILTERS)).toBe(false)
+    expect(isLink('', FILTERS)).toBe(false)
+    expect(isLink('#f.unknown=x', FILTERS)).toBe(false)
+    expect(isLink('#point=nldhl-1', FILTERS)).toBe(true)
+    expect(isLink('#view=table', FILTERS)).toBe(true)
+    expect(isLink('#f.type=weather', FILTERS)).toBe(true)
   })
 })
 
@@ -76,5 +103,16 @@ describe('encodeLink / decodeLink', () => {
       view: 'map',
       filters: { type: ['weather'], country: ALL.country },
     })
+  })
+
+  /**
+   * An old link may name only filter options that were since renamed. Narrowing
+   * to "none of them" would open the widget with every point hidden and no hint
+   * why; such a filter is left open instead. An explicit empty selection
+   * (`f.type=`) still means "nothing selected".
+   */
+  it('does not narrow a filter whose listed options have all disappeared', () => {
+    expect(decodeLink('#f.type=renamed', FILTERS).filters.type).toEqual(ALL.type)
+    expect(decodeLink('#f.type=', FILTERS).filters.type).toEqual([])
   })
 })

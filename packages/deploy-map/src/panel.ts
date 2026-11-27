@@ -1,5 +1,5 @@
 import type { Feature, Point } from 'geojson'
-import { formatCell, resolveColumns, type ColumnConfig, type ValueLabels } from './table'
+import { formatCell, own, resolveColumns, type ColumnConfig, type ValueLabels } from './table'
 
 export interface PanelSectionConfig {
   /** Heading above the section. */
@@ -35,7 +35,7 @@ export function resolvePanel(
   valueLabels: ValueLabels = {},
 ): { title: string; sections: PanelSection[] } {
   const text = (property: string) =>
-    formatCell(feature.properties?.[property], valueLabels[property])
+    formatCell(feature.properties?.[property], own(valueLabels, property))
   const sections: Partial<PanelSectionConfig>[] = config.sections ?? [{}]
   return {
     title: (config.titleProperty && text(config.titleProperty)) || DEFAULT_PANEL_TITLE,

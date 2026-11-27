@@ -62,4 +62,27 @@ describe('loadData', () => {
       'not a GeoJSON FeatureCollection',
     )
   })
+
+  /**
+   * Real data files contain the odd broken record. One feature without usable
+   * coordinates used to make Leaflet throw and replace the whole widget with
+   * an error, and lines or polygons were drawn but escaped filters and
+   * selection. Both are now left out, with a warning, and the rest is shown.
+   */
+  it('leaves out features that are not points with valid coordinates', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const good = collection.features[0]
+    const loaded = await loadData({
+      type: 'FeatureCollection',
+      features: [
+        good,
+        { type: 'Feature', geometry: { type: 'Point', coordinates: [] }, properties: {} },
+        { type: 'Feature', geometry: null, properties: {} },
+        { type: 'Feature', geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] }, properties: {} },
+      ],
+    } as unknown as PointCollection)
+    expect(loaded.features).toEqual([good])
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('left out 3 feature(s)'))
+    warn.mockRestore()
+  })
 })
