@@ -20,7 +20,7 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/radar-registry.js",
+  "main": "./dist/radar-registry.esm.js",
   "module": "./dist/radar-registry.esm.js",
   "types": "./dist/types/index.d.ts",
   "unpkg": "./dist/radar-registry.js",
@@ -28,8 +28,7 @@
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/radar-registry.esm.js",
-      "default": "./dist/radar-registry.js"
+      "default": "./dist/radar-registry.esm.js"
     },
     "./dist/radar-registry.css": "./dist/radar-registry.css"
   },
@@ -39,9 +38,10 @@
   "scripts": {
     "build": "vite build && vite build --mode esm && tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@aloftdata/deploy-map": "0.1.0"
+    "@aloftdata/deploy-map": "^0.1.0"
   }
 }

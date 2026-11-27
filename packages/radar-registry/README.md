@@ -24,8 +24,20 @@ deployment metadata, and links to a radar.
 The single script includes deploy-map, so nothing else needs loading.
 
 `data` is the only required option. Every [deploy-map option](../deploy-map#options)
-is accepted and replaces the preset of the same name as a whole, for example
-`{ data, permalink: false }`. The presets are exported as `PRESET`.
+is accepted and is merged over the presets, which are exported as `PRESET`:
+
+- `style`, `panel` and `table` are merged key by key, and `valueLabels` label
+  by label: `{ data, panel: { titleProperty: 'radar_id' } }` changes the panel
+  title and keeps the metadata sections.
+- Lists (`filters`, `panel.sections`, `table.columns`) and plain values
+  replace the preset: `{ data, permalink: false }`.
+
+As an ES module, also import the styles:
+
+```js
+import { mount } from '@aloftdata/radar-registry'
+import '@aloftdata/radar-registry/dist/radar-registry.css'
+```
 
 ## Development
 

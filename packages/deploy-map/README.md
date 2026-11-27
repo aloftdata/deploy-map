@@ -33,8 +33,9 @@ With a script tag (Vue and Leaflet are included in the bundle):
 </script>
 ```
 
-As an ES module, once the package is published (`vue` and `leaflet` are
-regular dependencies, and TypeScript types are included):
+As an ES module, once the package is published. TypeScript types are
+included. Vue 3.5 or later is a peer dependency: npm installs it for you, and
+an app that already uses Vue shares its copy with the widget.
 
 ```js
 import { mount } from '@aloftdata/deploy-map'
@@ -74,7 +75,7 @@ something in the widget.
 | `scrollZoom` | When the scroll wheel zooms the map: `'afterClick'` (default) only once the map has been clicked and until the pointer leaves it, so scrolling a page past the map is not interrupted; `'always'`; or `'never'`. |
 | `valueLabels` | Text to show instead of the data's values, per property: `{ type: { weather: 'Weather radar' } }`. Used by the filters, legend, table and panel; filter state and callbacks keep the data's values. Default: values are shown as they are. |
 | `panel` | The panel of a selected point (click a marker or a table row). `titleProperty` names the property used as title; `sections` is a list of `{ title, properties }`, with properties written like table columns; `content` is a function `(feature) => Element` that replaces the sections with your own element. Default: the title "Details" and every property holding a plain value. |
-| `permalink` | `true` keeps the selected point, the view and narrowed filters in the page's URL fragment (`#point=...&view=table&f.type=...`) and restores them from it, so a link opens the widget in the same state. Use it for one widget per page. Default `false`: the fragment belongs to your page. |
+| `permalink` | `true` keeps the selected point, the view and narrowed filters in the page's URL fragment (`#point=...&view=table&f.type=...`) and restores them from it, so a link opens the widget in the same state. The keys `point`, `view` and `f.<filter id>` are stable: links keep working across versions. Use it for one widget per page. Default `false`: the fragment belongs to your page. |
 | `idProperty` | Property that identifies a point in links. Default: the GeoJSON `id`, else a property named `id`, else the point's position in the data, which breaks links when the data is reordered. A point without the named property cannot be linked to. |
 | `onSelect` | Called with the GeoJSON feature when the user selects a point, and with `null` when the panel is closed. |
 | `onFilterChange` | Called with the selected options per filter id when the user changes a filter. |
