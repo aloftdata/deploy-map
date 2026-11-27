@@ -74,7 +74,8 @@ onBeforeUnmount(() => {
 .deploy-map__panel {
   flex: 0 0 20rem;
   overflow: auto;
-  padding: 0 0 0 0.75rem;
+  padding: 0.75rem;
+  border-left: 1px solid var(--bs-border-color);
   background: var(--bs-body-bg);
 }
 .deploy-map__panel-header {
@@ -91,8 +92,21 @@ onBeforeUnmount(() => {
 }
 .deploy-map .deploy-map__section-title {
   margin: 0.75rem 0 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bs-secondary-color);
+}
+/* Names in a quiet, fixed-width column, so the sections line up. */
+.deploy-map__panel th {
+  width: 45%;
+  font-weight: 400;
+  color: var(--bs-secondary-color);
+}
+.deploy-map__panel td:empty::before {
+  content: '-';
+  color: var(--bs-secondary-color);
 }
 /* Narrow widget: the panel covers the map or table instead of squeezing it. */
 @container (max-width: 40rem) {
@@ -100,7 +114,7 @@ onBeforeUnmount(() => {
     position: absolute;
     inset: 0;
     z-index: 1001; /* above Leaflet's controls and the legend */
-    padding: 0.5rem;
+    border-left: 0;
   }
 }
 </style>

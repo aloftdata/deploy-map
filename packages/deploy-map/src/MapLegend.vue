@@ -26,8 +26,10 @@ defineProps<{ entries: LegendEntry[] }>()
 <style>
 .deploy-map__legend {
   position: absolute;
-  left: 0.5rem;
-  bottom: 0.5rem;
+  /* Top right: clear of the zoom buttons and of the attribution, which wraps
+     over the whole bottom edge on a narrow map. */
+  top: 0.5rem;
+  right: 0.5rem;
   z-index: 1000; /* above the Leaflet panes and controls */
 }
 .deploy-map__swatch {

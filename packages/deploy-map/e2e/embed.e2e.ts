@@ -271,9 +271,12 @@ test('on a narrow widget the panel covers the map', async ({ page }) => {
   await openDemo(page, '/demo/index.html')
   const marker = await findMarker(page)
   await page.mouse.click(marker.x, marker.y)
-  const panel = await page.getByRole('complementary').boundingBox()
-  const body = await page.locator('.deploy-map__body').boundingBox()
-  expect(panel).toEqual(body)
+  const panel = (await page.getByRole('complementary').boundingBox())!
+  const body = (await page.locator('.deploy-map__body').boundingBox())!
+  // The body has a 1px frame, and the panel fills the inside of it.
+  for (const side of ['x', 'y', 'width', 'height'] as const) {
+    expect(Math.abs(panel[side] - body[side])).toBeLessThanOrEqual(2)
+  }
 })
 
 /**
@@ -388,7 +391,7 @@ for (const path of ['/demo/index.html', '/demo/bare.html']) {
     await page.getByRole('button', { name: 'nldhl', exact: true }).click()
     const panel = page.getByRole('complementary')
     await expect(panel.getByRole('heading', { name: 'Den Helder' })).toHaveCSS('font-size', '16px')
-    await expect(panel.getByRole('heading', { name: 'Radar metadata' })).toHaveCSS('font-size', '14px')
+    await expect(panel.getByRole('heading', { name: 'Radar metadata' })).toHaveCSS('font-size', '12px')
   })
 }
 

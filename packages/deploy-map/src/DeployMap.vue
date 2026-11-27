@@ -291,7 +291,7 @@ onBeforeUnmount(() => {
 .deploy-map__toolbar {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.5rem;
   padding-bottom: 0.5rem;
 }
@@ -300,6 +300,10 @@ onBeforeUnmount(() => {
   display: flex;
   flex: 1 1 0;
   min-height: 0;
+  /* One frame around map, table and panel. */
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  overflow: hidden;
 }
 .deploy-map__map,
 .deploy-map__table {
@@ -314,5 +318,14 @@ onBeforeUnmount(() => {
 }
 .deploy-map__table {
   overflow: auto;
+  padding: 0 0.5rem;
+}
+.deploy-map__table .table {
+  margin-bottom: 0;
+}
+/* The column names stay in sight while the rows scroll. */
+.deploy-map__table thead th {
+  position: sticky;
+  top: 0;
 }
 </style>

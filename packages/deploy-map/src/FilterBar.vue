@@ -36,7 +36,7 @@ function toggle(filter: Filter, option: string, checked: boolean) {
       <!-- Native popover: opens, closes on outside click and Escape, with no script. -->
       <button
         type="button"
-        class="btn btn-sm btn-outline-secondary"
+        class="deploy-map__filter-button btn btn-sm btn-outline-secondary"
         :popovertarget="`${uid}-${filter.id}`"
         :style="{ anchorName: anchor(filter) }"
       >
@@ -76,6 +76,16 @@ function toggle(filter: Filter, option: string, checked: boolean) {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+/* A small caret: the button opens a list. */
+.deploy-map__filter-button::after {
+  content: '';
+  display: inline-block;
+  margin-left: 0.35em;
+  vertical-align: 0.15em;
+  border: 0.3em solid transparent;
+  border-top-color: currentColor;
+  border-bottom: 0;
 }
 /* Placed under its button with CSS anchor positioning; the anchor names are
    set inline, one per filter. */
