@@ -6,11 +6,16 @@
     <title>deploy-map quick start</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../dist/deploy-map.css">
+    <!-- Colours the code examples; see the end of tutorial.js. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.11.1/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.11.1/highlight.min.js"></script>
     <script src="../dist/deploy-map.js"></script>
     <style>
       main { max-width: 52rem; }
       h2 { margin-top: 3rem; }
       pre { padding: 1rem; border: 1px solid var(--bs-border-color); border-radius: var(--bs-border-radius); background: var(--bs-tertiary-bg); }
+      /* The highlighter's theme brings its own box; the <pre> already is one. */
+      pre code.hljs { padding: 0; background: transparent; }
       .result { height: 400px; margin-bottom: 1.5rem; }
     </style>
   </head>
@@ -32,13 +37,13 @@
         Add the stylesheet and the script to your page. The script contains
         everything the widget needs, and creates one global, <code>DeployMap</code>.
       </p>
-<pre><code>&lt;link rel="stylesheet" href="deploy-map.css"&gt;
+<pre><code class="language-xml">&lt;link rel="stylesheet" href="deploy-map.css"&gt;
 &lt;script src="deploy-map.js"&gt;&lt;/script&gt;</code></pre>
       <p>
         Then add an element for the widget, and give it a height. The widget
         fills the element.
       </p>
-<pre><code>&lt;div id="map" style="height: 400px"&gt;&lt;/div&gt;</code></pre>
+<pre><code class="language-xml">&lt;div id="map" style="height: 400px"&gt;&lt;/div&gt;</code></pre>
 
       <h2 id="first">Your first map</h2>
       <p>
@@ -48,7 +53,7 @@
         any properties you like. Note that GeoJSON coordinates are longitude
         first, then latitude.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#first-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#first-map', {
   data: {
     type: 'FeatureCollection',
     features: [
@@ -84,7 +89,7 @@
         itself. The rest of this page uses a file of radar deployments in
         western Europe.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#url-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#url-map', {
   data: 'registry.json',
 })</code></pre>
       <div id="url-map" class="result"></div>
@@ -100,7 +105,7 @@
         (<code>radar_id</code> becomes "Radar id"); to choose it yourself, give
         an object with a <code>label</code>.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#table-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#table-map', {
   data: 'registry.json',
   table: {
     columns: [
@@ -122,7 +127,7 @@
         checkboxes. Untick "Germany" below and the German radars leave the map
         and the table.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#filter-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#filter-map', {
   data: 'registry.json',
   filters: ['country'],
 })</code></pre>
@@ -133,7 +138,7 @@
         "France" shows both. Different filters narrow each other down:
         "weather" and "Netherlands" shows only Dutch weather radars.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#filters-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#filters-map', {
   data: 'registry.json',
   filters: [{ property: 'type', label: 'Radar type' }, 'country'],
 })</code></pre>
@@ -146,7 +151,7 @@
         matching ones are seen in context. The table lists matching points only
         in both cases.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#dim-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#dim-map', {
   data: 'registry.json',
   filters: ['country'],
   matchBehaviour: 'dim',
@@ -159,7 +164,7 @@
         a marker. Each value gets a colour from a built-in palette that stays
         readable for colour-blind people, and a legend appears on the map.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#colour-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#colour-map', {
   data: 'registry.json',
   style: { colourBy: 'type' },
 })</code></pre>
@@ -168,7 +173,7 @@
         To choose colours yourself, add a <code>palette</code>. You only need to
         list the values you care about; the others keep a built-in colour.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#palette-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#palette-map', {
   data: 'registry.json',
   style: {
     colourBy: 'type',
@@ -191,7 +196,7 @@
         each section lists properties the same way as table columns: a name,
         or a name with a label.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#panel-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#panel-map', {
   data: 'registry.json',
   panel: {
     titleProperty: 'location',
@@ -222,7 +227,7 @@
         filter, the legend, the table and the panel. Your data, and what the
         callbacks receive, stay as they are.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#labels-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#labels-map', {
   data: 'registry.json',
   filters: ['type'],
   style: { colourBy: 'type' },
@@ -240,7 +245,7 @@
         <code>textContent</code> rather than <code>innerHTML</code>, so that
         text from the data can never be read as HTML.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#custom-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#custom-map', {
   data: 'registry.json',
   panel: {
     titleProperty: 'location',
@@ -262,7 +267,7 @@
         address. A link can then lead straight to one point with its panel
         open. Try it on the <a href="index.html#point=nldhl-1">demo</a>.
       </p>
-<pre><code>DeployMap.mount('#map', {
+<pre><code class="language-javascript">DeployMap.mount('#map', {
   data: 'registry.json',
   permalink: true,
   idProperty: 'deployment_id',
@@ -294,7 +299,7 @@
         line under the buttons.
         Then untick a country and use the two buttons.
       </p>
-<pre class="runnable"><code>const log = document.querySelector('#events-log')
+<pre class="runnable"><code class="language-javascript">const log = document.querySelector('#events-log')
 
 const widget = DeployMap.mount('#events-map', {
   data: 'registry.json',
@@ -330,7 +335,7 @@ document.querySelector('#events-dim').addEventListener('click', () => {
         and the attribution their provider asks for. Check the provider's terms
         of use first.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#tiles-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#tiles-map', {
   data: 'registry.json',
   tileLayer: {
     url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -352,7 +357,7 @@ document.querySelector('#events-dim').addEventListener('click', () => {
         let the wheel zoom straight away with <code>scrollZoom: 'always'</code>.
         <code>'never'</code> turns wheel zooming off.
       </p>
-<pre class="runnable"><code>DeployMap.mount('#scroll-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#scroll-map', {
   data: 'registry.json',
   scrollZoom: 'always',
 })</code></pre>
@@ -382,7 +387,7 @@ document.querySelector('#events-dim').addEventListener('click', () => {
 
       <h2 id="together">Putting it together</h2>
       <p>All of the above in one widget.</p>
-<pre class="runnable"><code>DeployMap.mount('#full-map', {
+<pre class="runnable"><code class="language-javascript">DeployMap.mount('#full-map', {
   data: 'registry.json',
   table: {
     columns: [
@@ -409,6 +414,87 @@ document.querySelector('#events-dim').addEventListener('click', () => {
   },
 })</code></pre>
       <div id="full-map" class="result"></div>
+
+      <h2 id="vue">Advanced: using it in a Vue app</h2>
+      <p>
+        Everything above uses a script tag. If your site is a
+        <a href="https://vuejs.org/">Vue 3</a> app with a build step, you can
+        use the widget as a component instead. Install the package next to Vue
+        (3.5 or later), which the widget then shares with your app:
+      </p>
+<pre><code class="language-bash">npm install @aloftdata/deploy-map vue</code></pre>
+      <p>
+        Import the <code>DeployMap</code> component and its stylesheet. The
+        options of <code>DeployMap.mount()</code> are the component's props,
+        with the same names and the same defaults. As before, the widget fills
+        its container, so give that a height.
+      </p>
+<pre><code class="language-xml">&lt;script setup&gt;
+import { DeployMap } from '@aloftdata/deploy-map'
+import '@aloftdata/deploy-map/dist/deploy-map.css'
+
+const filters = [{ property: 'type', label: 'Radar type' }, 'country']
+const style = { colourBy: 'type' }
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div style="height: 400px"&gt;
+    &lt;DeployMap data="/registry.json" :filters="filters" :style="style" /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+      <p>
+        Props are reactive, so there is no <code>update()</code>: change a prop
+        and the widget follows. The <code>onSelect</code>,
+        <code>onFilterChange</code> and <code>onViewChange</code> callbacks
+        become the events <code>select</code>, <code>filter-change</code> and
+        <code>view-change</code>.
+      </p>
+<pre><code class="language-xml">&lt;script setup&gt;
+import { ref } from 'vue'
+import { DeployMap } from '@aloftdata/deploy-map'
+import '@aloftdata/deploy-map/dist/deploy-map.css'
+
+const matchBehaviour = ref('hide')
+const selected = ref(null)
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;label&gt;
+    &lt;input v-model="matchBehaviour" type="checkbox" true-value="dim" false-value="hide"&gt;
+    Dim the points that do not match
+  &lt;/label&gt;
+  &lt;p&gt;Selected: {{ selected ? selected.properties.location : 'nothing' }}&lt;/p&gt;
+
+  &lt;div style="height: 400px"&gt;
+    &lt;DeployMap
+      data="/registry.json"
+      :filters="['type', 'country']"
+      :match-behaviour="matchBehaviour"
+      @select="selected = $event"
+    /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+      <p>
+        The <code>panel</code> slot replaces the content of the details panel
+        with your own template. It receives the selected point as
+        <code>feature</code>, and the panel keeps its title and its Close button.
+        This is the Vue counterpart of <a href="#custom-panel">the
+        <code>content</code> function</a>.
+      </p>
+<pre><code class="language-xml">&lt;DeployMap data="/registry.json" :panel="{ titleProperty: 'location' }"&gt;
+  &lt;template #panel="{ feature }"&gt;
+    &lt;p&gt;
+      {{ feature.properties.radar_id }}, in {{ feature.properties.country }}
+      since {{ feature.properties.start }}.
+    &lt;/p&gt;
+    &lt;RouterLink :to="`/radars/${feature.properties.radar_id}`"&gt;More about this radar&lt;/RouterLink&gt;
+  &lt;/template&gt;
+&lt;/DeployMap&gt;</code></pre>
+      <p>
+        In TypeScript, the option types are exported as well:
+        <code>DeployMapConfig</code>, <code>FilterConfig</code>,
+        <code>StyleConfig</code>, <code>PanelConfig</code> and others.
+      </p>
     </main>
     <script src="tutorial.js"></script>
   </body>
