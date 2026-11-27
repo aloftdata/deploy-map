@@ -1,4 +1,5 @@
 import type { Feature, Point } from 'geojson'
+import { own } from './table'
 
 export interface StyleConfig {
   /** Property whose value decides a point's colour. Without it, all points share one colour. */
@@ -59,11 +60,11 @@ export function resolveStyle(
   const colors = new Map<string, string>()
   let next = 0
   for (const value of [...values].sort((a, b) => a.localeCompare(b))) {
-    colors.set(value, palette[value] ?? DEFAULT_PALETTE[next++ % DEFAULT_PALETTE.length])
+    colors.set(value, own(palette, value) ?? DEFAULT_PALETTE[next++ % DEFAULT_PALETTE.length])
   }
 
   const legend = [...colors].map(([value, color]) => ({
-    label: labels[colorBy]?.[value] ?? value,
+    label: own(own(labels, colorBy), value) ?? value,
     color,
   }))
   if (hasUnknown) legend.push({ label: UNKNOWN_LABEL, color: UNKNOWN_COLOR })

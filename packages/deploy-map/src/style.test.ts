@@ -77,4 +77,16 @@ describe('resolveStyle', () => {
     expect(labelled.legend.map((entry) => entry.label)).toEqual(['birdscan', 'Weather radar'])
     expect(labelled.legend.map((entry) => entry.color)).toEqual(plain.legend.map((entry) => entry.color))
   })
+
+  /**
+   * Values are used as keys into the palette. A value named like a built-in
+   * object member ("constructor") must get a palette colour, not that member.
+   */
+  it('does not take a colour from a built-in object member', () => {
+    const points = [
+      { type: 'Feature' as const, geometry: { type: 'Point' as const, coordinates: [0, 0] }, properties: { type: 'constructor' } },
+    ]
+    const { legend } = resolveStyle(points, { colorBy: 'type' })
+    expect(legend).toEqual([{ label: 'constructor', color: DEFAULT_PALETTE[0] }])
+  })
 })

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useId } from 'vue'
 import { isRestricting, type Filter, type FilterState } from './filters'
-import type { ValueLabels } from './table'
+import { own, type ValueLabels } from './table'
 
 const props = defineProps<{
   filters: Filter[]
@@ -62,7 +62,7 @@ function toggle(filter: Filter, option: string, checked: boolean) {
               @change="toggle(filter, option, ($event.target as HTMLInputElement).checked)"
             />
             <label class="form-check-label" :for="`${uid}-${filter.id}-${index}`">
-              {{ valueLabels?.[filter.property]?.[option] ?? option }}
+              {{ own(own(valueLabels, filter.property), option) ?? option }}
             </label>
           </div>
         </fieldset>

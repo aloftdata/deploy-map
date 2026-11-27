@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import type { Feature, Point } from 'geojson'
-import { formatCell, type Column, type ValueLabels } from './table'
+import { formatCell, own, type Column, type ValueLabels } from './table'
 
 const props = defineProps<{
   features: Feature<Point>[]
   columns: Column[]
   selected?: Feature<Point>
+  /** A stable key per feature, so a row keeps its DOM (and focus) when the list is filtered. */
+  rowKey: (feature: Feature<Point>) => number
   valueLabels?: ValueLabels
 }>()
 
 function cell(feature: Feature<Point>, property: string) {
-  return formatCell(feature.properties?.[property], props.valueLabels?.[property])
+  return formatCell(feature.properties?.[property], own(props.valueLabels, property))
 }
 
 defineEmits<{ select: [feature: Feature<Point>] }>()
@@ -26,10 +28,11 @@ defineEmits<{ select: [feature: Feature<Point>] }>()
       </thead>
       <tbody>
         <tr
-          v-for="(feature, index) in features"
-          :key="index"
+          v-for="feature in features"
+          :key="rowKey(feature)"
           class="deploy-map__row"
           :class="{ 'table-active': feature === selected }"
+          :aria-current="feature === selected ? 'true' : undefined"
           @click="$emit('select', feature)"
         >
           <td v-for="(column, position) in columns" :key="column.property">
