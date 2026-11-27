@@ -11,7 +11,7 @@ import '@aloftdata/deploy-map/dist/deploy-map.css'
 /** The registry's presets. Any of them can be overridden in `mount()`. */
 export const PRESET = {
   filters: [{ property: 'type', label: 'Radar type' }],
-  style: { colorBy: 'type' },
+  style: { colourBy: 'type' },
   valueLabels: { type: { weather: 'Weather radar', birdscan: 'BirdScan', other: 'Other' } },
   table: {
     columns: [

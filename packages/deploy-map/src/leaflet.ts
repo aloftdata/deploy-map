@@ -36,6 +36,8 @@ export type MatchBehaviour = 'hide' | 'dim'
 export interface MapHandle {
   /** Show the points that pass `isMatch` normally, and hide or dim the others. */
   update: (isMatch: (feature: Feature<Point>) => boolean, behaviour: MatchBehaviour) => void
+  /** Give every marker the colour `colorOf` returns for its feature. */
+  recolour: (colorOf: (feature: Feature<Point>) => string) => void
   /** Highlight the marker of `feature`, or none. `center` also moves the map to it. */
   select: (feature: Feature<Point> | undefined, center?: boolean) => void
   destroy: () => void
@@ -102,6 +104,9 @@ export function createMap(
         if (!visible && layer.hasLayer(marker)) layer.removeLayer(marker)
         marker.setStyle(match ? SOLID : DIMMED)
       }
+    },
+    recolour(colorOf) {
+      for (const [feature, marker] of markers) marker.setStyle({ color: colorOf(feature) })
     },
     select(feature, center = false) {
       for (const [candidate, marker] of markers) {
