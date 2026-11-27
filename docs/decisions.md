@@ -24,3 +24,8 @@
 **What:** `style.colourBy` (was `colorBy`), `onFilterChange` and `onViewChange` (were `onFilterchange`, `onViewchange`); `style` and `filters` now react to changes and `update()` accepts every reactive option; unknown option names are reported in the console.
 **Why:** One spelling across options and docs (`matchBehaviour`, "colours"), and renames are free only before the first release; the warning covers the habit of typing `colorBy`.
 **Rejected:** American spelling to match CSS and Leaflet, accepting both spellings as aliases, making `data` and `tileLayer` reactive (documented as read once instead).
+
+## 2026-11-27 - Packaging before 0.1: Vue as a peer, ES module as the main entry, merged presets
+**What:** `vue` is a peer dependency (`^3.5.0`) of deploy-map; `main` and the default export of both packages point at the ES module, the script-tag bundle stays under `unpkg`/`jsdelivr`; radar-registry depends on deploy-map `^0.1.0` and merges host options over its presets one level deep. Fragment keys (`point`, `view`, `f.<id>`) are declared stable.
+**Why:** A Vue app must share one Vue with the component; `require()` of the old entry returned nothing; whole-option replacement made a one-label tweak drop the other presets.
+**Rejected:** A CommonJS build, `leaflet` as a peer (hosts on 1.9 need our 2.0 copy alongside), deep-merging lists, a namespace prefix for the fragment keys (can be added as an option later).
